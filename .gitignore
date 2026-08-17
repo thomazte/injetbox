@@ -30,11 +30,8 @@ android/.gradle
 android/build
 android/app/build
 android/app/release
-android/app/src/main/assets/public
 android/local.properties
 android/captures
-android/.idea
 *.apk
 *.aab
-*.iml
 
