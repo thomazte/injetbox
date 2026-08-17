@@ -13,16 +13,18 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "desktop": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && electron .\"",
-    "desktop:build": "vite build --base ./ && electron-builder --win portable",
+    "desktop:build": "vite build --base ./ && electron-builder --win portable && node scripts/copy-desktop-build.mjs",
     "android:sync": "npm run build && npx cap sync android",
     "android:open": "npx cap open android",
-    "android:apk": "npm run android:sync && cd android && gradlew.bat assembleDebug"
+    "android:apk": "npm run android:sync && node scripts/build-android-apk.mjs"
   },
   "build": {
     "appId": "br.injetbox.app",
     "productName": "InjetBox",
+    "executableName": "InjetBox",
+    "artifactName": "InjetBox ${version}.${ext}",
     "directories": {
-      "output": "C:/Users/thoma/Desktop/EstoqueCarcacas"
+      "output": "release"
     },
     "files": [
       "dist/**/*",
