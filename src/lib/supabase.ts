@@ -7,7 +7,14 @@ const key = import.meta.env.VITE_SUPABASE_ANON_KEY || SUPABASE_ANON_KEY
 export const isConfigured = Boolean(url && key)
 
 export const supabase: SupabaseClient | null = isConfigured
-  ? createClient(url, key)
+  ? createClient(url, key, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: false,
+        flowType: 'implicit',
+      },
+    })
   : null
 
 export function getSupabase(): SupabaseClient {

@@ -14,11 +14,26 @@ const messages: Record<string, string> = {
 
 export function authMessage(error: string | null | undefined): string {
   if (!error) return 'Não foi possível entrar.'
+  const lower = error.toLowerCase()
   if (messages[error]) return messages[error]
-  const found = Object.entries(messages).find(([key]) => error.toLowerCase().includes(key.toLowerCase()))
+  const found = Object.entries(messages).find(([key]) => lower.includes(key.toLowerCase()))
   if (found) return found[1]
-  if (error.toLowerCase().includes('rate limit')) {
+  if (lower.includes('rate limit')) {
     return 'Muitas tentativas. Espere um pouco e tente de novo.'
   }
+  if (
+    lower.includes('failed to fetch') ||
+    lower.includes('networkerror') ||
+    lower.includes('network request failed') ||
+    lower.includes('load failed') ||
+    lower.includes('the internet connection appears to be offline')
+  ) {
+    return 'Sem conexão com o banco. Confira a internet e tente de novo.'
+  }
   return error
+}
+
+export function authCaught(err: unknown): string {
+  if (err instanceof Error) return authMessage(err.message)
+  return 'Não foi possível entrar.'
 }

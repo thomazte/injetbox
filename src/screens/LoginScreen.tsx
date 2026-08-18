@@ -40,6 +40,8 @@ export function LoginScreen() {
       } else {
         await signIn(email, password)
       }
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : 'Não foi possível entrar.')
     } finally {
       setBusy(false)
     }
@@ -51,7 +53,8 @@ export function LoginScreen() {
         <p className="text-sm font-medium tracking-wide text-accent uppercase">{APP_NAME}</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink">{APP_TAGLINE}</h1>
         <p className="mt-3 text-muted">
-          Crie sua conta com e-mail e senha. Cada usuário tem o próprio estoque, separado dos demais.
+          Entre com o e-mail e a senha da oficina. Precisa de internet. Cada usuário vê só o próprio
+          estoque.
         </p>
 
         <div className="mt-8 grid grid-cols-2 rounded-xl glass p-1">

@@ -1,10 +1,22 @@
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow, session, shell } from 'electron'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const electronDir = path.dirname(fileURLToPath(import.meta.url))
 
 function createWindow() {
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    const headers = { ...details.responseHeaders }
+    if (details.url.includes('supabase.co')) {
+      headers['Access-Control-Allow-Origin'] = ['*']
+      headers['Access-Control-Allow-Headers'] = [
+        'authorization, apikey, content-type, x-client-info, x-supabase-api-version',
+      ]
+      headers['Access-Control-Allow-Methods'] = ['GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS']
+    }
+    callback({ responseHeaders: headers })
+  })
+
   const window = new BrowserWindow({
     width: 1280,
     height: 820,

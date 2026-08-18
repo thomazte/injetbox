@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { authMessage } from '../lib/authErrors'
+import { authCaught, authMessage } from '../lib/authErrors'
 import {
   clearLocalSession,
   localSignIn,
@@ -53,17 +53,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const client = getSupabase()
-
-    client.auth.getSession().then(({ data }) => {
-      setSession(data.session)
-      setLoading(false)
-    })
+    let settled = false
+    const finish = (next: Session | null) => {
+      setSession(next)
+      if (!settled) {
+        settled = true
+        setLoading(false)
+      }
+    }
 
     const { data: listener } = client.auth.onAuthStateChange((_event, next) => {
-      setSession(next)
+      finish(next)
     })
 
-    return () => listener.subscription.unsubscribe()
+    const timer = window.setTimeout(() => {
+      if (!settled) setLoading(false)
+    }, 2500)
+
+    return () => {
+      listener.subscription.unsubscribe()
+      window.clearTimeout(timer)
+    }
   }, [])
 
   useEffect(() => {
@@ -80,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       'Usuário'
     setName(fallback)
 
-    getSupabase()
+    void getSupabase()
       .from('profiles')
       .select('name')
       .eq('id', user.id)
@@ -120,18 +130,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return
         }
 
-        const { error: nextError } = await getSupabase().auth.signInWithPassword({
-          email: cleanEmail,
-          password: cleanPassword,
-        })
-        if (nextError) setError(authMessage(nextError.message))
+        try {
+          const { data, error: nextError } = await getSupabase().auth.signInWithPassword({
+            email: cleanEmail,
+            password: cleanPassword,
+          })
+          if (nextError) {
+            setError(authMessage(nextError.message))
+            return
+          }
+          if (data.session) setSession(data.session)
+        } catch (err) {
+          setError(authCaught(err))
+        }
       },
       async signUp(nextName, email, password) {
         setError(null)
         setNotice(null)
+        const cleanEmail = email.trim().toLowerCase()
+        const cleanPassword = password.trim()
         if (!isConfigured) {
           try {
-            const next = await localSignUp(nextName, email, password)
+            const next = await localSignUp(nextName, cleanEmail, cleanPassword)
             setLocalUser({ id: next.id, email: next.email })
             setName(next.name)
           } catch (err) {
@@ -140,18 +160,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return
         }
 
-        const { data, error: nextError } = await getSupabase().auth.signUp({
-          email,
-          password,
-          options: { data: { name: nextName } },
-        })
-        if (nextError) {
-          setError(authMessage(nextError.message))
-          return
-        }
-        setName(nextName)
-        if (!data.session) {
+        try {
+          const { data, error: nextError } = await getSupabase().auth.signUp({
+            email: cleanEmail,
+            password: cleanPassword,
+            options: { data: { name: nextName } },
+          })
+          if (nextError) {
+            setError(authMessage(nextError.message))
+            return
+          }
+          setName(nextName)
+          if (data.session) {
+            setSession(data.session)
+            return
+          }
           setNotice('Conta criada. Entre com seu e-mail e senha.')
+        } catch (err) {
+          setError(authCaught(err))
         }
       },
       async signOut() {
@@ -163,7 +189,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setName('')
           return
         }
-        await getSupabase().auth.signOut()
+        try {
+          await getSupabase().auth.signOut()
+        } catch {
+          /* sessão local some mesmo se a rede falhar */
+        }
+        setSession(null)
+        setName('')
       },
     }),
     [user, session, name, loading, error, notice],
