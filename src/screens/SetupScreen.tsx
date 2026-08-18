@@ -4,8 +4,7 @@ export function SetupScreen() {
       <p className="text-sm font-medium tracking-wide text-accent uppercase">InjetBox</p>
       <h1 className="mt-2 text-3xl font-semibold tracking-tight">Banco na nuvem</h1>
       <p className="mt-3 text-muted">
-        O cadastro de contas já funciona neste aparelho. Para vender o produto com estoque na nuvem,
-        conecte um projeto Supabase.
+        O InjetBox já entra nas contas da nuvem no desktop e no celular. Cada usuário vê só o próprio estoque.
       </p>
     </main>
   )

@@ -107,9 +107,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       async signIn(email, password) {
         setError(null)
         setNotice(null)
+        const cleanEmail = email.trim().toLowerCase()
+        const cleanPassword = password.trim()
         if (!isConfigured) {
           try {
-            const next = await localSignIn(email, password)
+            const next = await localSignIn(cleanEmail, cleanPassword)
             setLocalUser({ id: next.id, email: next.email })
             setName(next.name)
           } catch (err) {
@@ -119,8 +121,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         const { error: nextError } = await getSupabase().auth.signInWithPassword({
-          email,
-          password,
+          email: cleanEmail,
+          password: cleanPassword,
         })
         if (nextError) setError(authMessage(nextError.message))
       },

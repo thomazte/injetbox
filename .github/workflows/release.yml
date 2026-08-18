@@ -8,10 +8,6 @@ on:
 permissions:
   contents: write
 
-env:
-  VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-  VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-
 jobs:
   android:
     runs-on: ubuntu-latest
@@ -27,8 +23,6 @@ jobs:
           java-version: '21'
       - uses: android-actions/setup-android@v3
       - run: npm ci
-      - run: |
-          printf 'VITE_SUPABASE_URL=%s\nVITE_SUPABASE_ANON_KEY=%s\n' "$VITE_SUPABASE_URL" "$VITE_SUPABASE_ANON_KEY" > .env
       - run: npm run build
       - run: npx cap sync android
       - run: chmod +x android/gradlew
@@ -47,9 +41,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - shell: bash
-        run: |
-          printf 'VITE_SUPABASE_URL=%s\nVITE_SUPABASE_ANON_KEY=%s\n' "$VITE_SUPABASE_URL" "$VITE_SUPABASE_ANON_KEY" > .env
       - run: npm run desktop:build
       - uses: actions/upload-artifact@v4
         with:
