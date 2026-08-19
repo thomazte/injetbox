@@ -23,6 +23,7 @@ jobs:
           java-version: '21'
       - uses: android-actions/setup-android@v3
       - run: npm ci
+      - run: node scripts/set-release-version.mjs
       - run: npm run build
       - run: npx cap sync android
       - run: chmod +x android/gradlew
@@ -41,6 +42,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: node scripts/set-release-version.mjs
       - run: npm run desktop:build
       - uses: actions/upload-artifact@v4
         with:
