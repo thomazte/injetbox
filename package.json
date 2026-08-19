@@ -4,7 +4,7 @@
   "author": "ZamohtExe",
   "license": "UNLICENSED",
   "private": true,
-  "version": "1.0.3",
+  "version": "1.0.5",
   "type": "module",
   "main": "electron/main.mjs",
   "scripts": {
