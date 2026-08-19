@@ -60,7 +60,7 @@ export function ImportScreen({ onClose }: { onClose: () => void }) {
     <div className="overlay fixed inset-0 z-40 px-3 py-6 lg:flex lg:items-center lg:justify-center">
       <form
         onSubmit={onSubmit}
-        className="sheet-enter glass-strong mx-auto flex max-h-[90dvh] max-w-lg flex-col overflow-hidden rounded-3xl lg:w-full lg:max-w-xl"
+        className="sheet-enter sheet-panel mx-auto flex max-h-[90dvh] max-w-lg flex-col overflow-hidden rounded-3xl lg:w-full lg:max-w-xl"
       >
         <div className="flex items-center justify-between border-b border-line px-5 py-4">
           <h2 className="text-lg font-semibold">Importar planilha</h2>

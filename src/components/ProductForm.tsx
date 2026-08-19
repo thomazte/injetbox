@@ -42,7 +42,7 @@ export function ProductForm({ onClose }: { onClose: () => void }) {
   return (
     <div className="overlay fixed inset-0 z-40 px-3 py-6 lg:flex lg:items-center lg:justify-center" onClick={onClose}>
       <form
-        className="sheet-enter glass-strong mx-auto max-h-[90dvh] max-w-lg overflow-y-auto rounded-3xl p-5 lg:w-full lg:max-w-xl"
+        className="sheet-enter sheet-panel mx-auto max-h-[90dvh] max-w-lg overflow-y-auto rounded-3xl p-5 lg:w-full lg:max-w-xl"
         onClick={(event) => event.stopPropagation()}
         onSubmit={onSubmit}
       >

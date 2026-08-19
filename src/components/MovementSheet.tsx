@@ -93,7 +93,7 @@ export function MovementSheet({
   return (
     <div className="overlay fixed inset-0 z-40 lg:flex lg:items-center lg:justify-center lg:p-8" onClick={onClose}>
       <div
-        className="sheet-enter glass-strong absolute inset-x-0 bottom-0 mx-auto max-w-lg rounded-t-3xl p-5 pb-8 lg:static lg:max-h-[min(85vh,720px)] lg:w-full lg:max-w-md lg:overflow-y-auto lg:rounded-3xl lg:pb-5"
+        className="sheet-enter sheet-panel absolute inset-x-0 bottom-0 mx-auto max-w-lg rounded-t-3xl p-5 pb-8 lg:static lg:max-h-[min(85vh,720px)] lg:w-full lg:max-w-md lg:overflow-y-auto lg:rounded-3xl lg:pb-5"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-white/30 lg:hidden" />
