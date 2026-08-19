@@ -55,9 +55,23 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
       - uses: softprops/action-gh-release@v2
+        id: publish
+        continue-on-error: true
         with:
           files: |
             injetbox-android/InjetBox.apk
             injetbox-windows/*.exe
           generate_release_notes: true
           name: InjetBox ${{ github.ref_name }}
+          fail_on_unmatched_files: true
+          overwrite_files: true
+      - if: steps.publish.outcome == 'failure'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            injetbox-android/InjetBox.apk
+            injetbox-windows/*.exe
+          generate_release_notes: true
+          name: InjetBox ${{ github.ref_name }}
+          fail_on_unmatched_files: true
+          overwrite_files: true

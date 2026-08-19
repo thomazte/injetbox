@@ -4,7 +4,7 @@
   "author": "ZamohtExe",
   "license": "UNLICENSED",
   "private": true,
-  "version": "1.0.5",
+  "version": "1.0.6",
   "type": "module",
   "main": "electron/main.mjs",
   "scripts": {
@@ -22,7 +22,7 @@
     "appId": "br.injetbox.app",
     "productName": "InjetBox",
     "executableName": "InjetBox",
-    "artifactName": "InjetBox ${version}.${ext}",
+    "artifactName": "InjetBox-${version}.${ext}",
     "directories": {
       "output": "release"
     },
