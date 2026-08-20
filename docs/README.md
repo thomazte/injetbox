@@ -4,7 +4,7 @@ Documentação do projeto. O resumo rápido para subir o ambiente continua no [`
 
 InjetBox é um controle de estoque para oficina: cadastro de peças, entrada e saída, alerta de estoque baixo e histórico. Roda no navegador, no Windows (Electron) e no Android (Capacitor). O backend é o Supabase (auth + Postgres). Cada conta vê só o próprio estoque.
 
-Versão atual: **1.0.6**. Autor: **ZamohtExe**. Licença proprietária — veja [`LICENSE`](../LICENSE).
+Versão atual: **1.0.7**. Autor: **ZamohtExe**. Licença proprietária — veja [`LICENSE`](../LICENSE).
 
 - [O que o app faz](#o-que-o-app-faz)
 - [Telas](#telas)
@@ -243,7 +243,7 @@ Internet é obrigatória no modo nuvem (`AndroidManifest` pede `INTERNET`).
 
 ## Release
 
-A versão canônica no repo é a do `package.json` (hoje `1.0.6`). O instalador Windows usa essa versão no nome do arquivo. O Android usa `versionName` em `android/app/build.gradle`.
+A versão canônica no repo é a do `package.json` (hoje `1.0.7`). O instalador Windows usa essa versão no nome do arquivo. O Android usa `versionName` em `android/app/build.gradle`.
 
 ### CI do dia a dia
 
