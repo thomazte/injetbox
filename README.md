@@ -18,4 +18,4 @@ Abre http://localhost:5173/
 ## CI e restore
 
 - Cada push em `main` roda o workflow **CI** (lint + build).
-- O passo a passo para recuperar o projeto está em `RESTORE.md`.
+- Documentação: [`docs/README.md`](docs/README.md)
