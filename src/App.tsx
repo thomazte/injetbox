@@ -79,18 +79,19 @@ function Gate() {
 }
 
 function Shell() {
-  const { signOut, name, companyName, tenantSettings, isAdmin, isPlatformAdmin } = useAuth()
+  const { signOut, name, companyName, tenantSettings, isPlatformAdmin } = useAuth()
   const { lowStock, error } = useInventory()
   const [visualHeaderPreview, setVisualHeaderPreview] = useState<HeaderPreview | null>(null)
+  const canAccessBranding = isPlatformAdmin && (appMode === 'demo' || import.meta.env.DEV)
   const visibleTabs = useMemo(
     () =>
       tabs.filter((item) => {
         if (item.id === 'alertas') return appFeatures.canSeeAlerts
         if (item.id === 'historico') return appFeatures.canSeeHistory
-        if (item.id === 'visual') return appFeatures.canManageBranding && (isAdmin || isPlatformAdmin)
+        if (item.id === 'visual') return appFeatures.canManageBranding && canAccessBranding
         return true
       }),
-    [isAdmin, isPlatformAdmin],
+    [canAccessBranding],
   )
   const [tab, setTab] = useState<Tab>(visibleTabs[0]?.id ?? 'estoque')
   const titles: Record<Tab, string> = {
@@ -234,8 +235,10 @@ function BrandLogo({ src, alt, size = 'md' }: { src: string; alt: string; size?:
       src={src}
       alt={alt}
       className={`shrink-0 border border-white/10 bg-transparent object-contain ${dimension}`}
-      loading="lazy"
+      loading="eager"
+      fetchPriority="high"
       decoding="async"
+      referrerPolicy="no-referrer"
       onError={() => setFailed(true)}
     />
   )

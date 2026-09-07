@@ -43,7 +43,7 @@ export const appFeaturesByMode: Record<AppMode, AppFeatures> = {
     canEditProducts: true,
     canDeleteProducts: true,
     canMoveStock: true,
-    canManageBranding: true,
+    canManageBranding: false,
   },
   catalogo: {
     canSeeAlerts: false,

@@ -410,8 +410,9 @@ export function BrandingScreen({
                 src={normalizePreviewLogoUrl(logoUrl)}
                 alt={company || 'Logo da empresa'}
                 className="mt-2 h-16 w-auto max-w-full rounded-lg border border-white/10 bg-transparent object-contain"
-                loading="lazy"
+                loading="eager"
                 decoding="async"
+                referrerPolicy="no-referrer"
                 onError={() => setLogoPreviewError(true)}
               />
             )}
