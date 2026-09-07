@@ -386,6 +386,19 @@ export function BrandingScreen({
         <Field label="Nome da empresa">
           <input value={company} onChange={(event) => setCompany(event.target.value)} placeholder="Renata Peças Diesel" />
         </Field>
+<<<<<<< HEAD
+=======
+        <Field label="Ícone do catálogo (URL da logo)">
+          <input
+            value={logoUrl}
+            onChange={(event) => setLogoUrl(event.target.value)}
+            placeholder="https://exemplo.com/logo.png"
+          />
+        </Field>
+        <p className="-mt-2 text-[11px] text-muted">
+          Este ícone aparece somente no catálogo público.
+        </p>
+>>>>>>> develop
 
         <div className="grid gap-3 md:grid-cols-2">
           <Field label="Cor principal">

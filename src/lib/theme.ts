@@ -1,4 +1,8 @@
 import type { TenantSettings } from '../types'
+<<<<<<< HEAD
+=======
+import { appMode } from './appMode'
+>>>>>>> develop
 
 type ThemeVars = {
   accent: string
@@ -17,6 +21,7 @@ type ThemeVars = {
 }
 
 const defaults: ThemeVars = {
+<<<<<<< HEAD
   accent: '#2563EB',
   accentSoft: 'rgba(37, 99, 235, 0.18)',
   background: '#0B1220',
@@ -30,6 +35,21 @@ const defaults: ThemeVars = {
   lowText: '#000000',
   zeroBg: '#FFFFFF',
   zeroText: '#000000',
+=======
+  accent: '#ff6a00',
+  accentSoft: 'rgba(255, 106, 0, 0.18)',
+  background: '#0a0a0a',
+  backgroundAlt: '#070707',
+  surface: '#161616',
+  ink: '#ffffff',
+  muted: '#c4c4c4',
+  okBg: 'rgba(255, 106, 0, 0.18)',
+  okText: '#ff6a00',
+  lowBg: '#ff6a00',
+  lowText: '#ffffff',
+  zeroBg: '#101010',
+  zeroText: '#ffffff',
+>>>>>>> develop
 }
 
 const LOGIN_THEME_CACHE_KEY = 'injetbox:login-theme:v1'
@@ -136,9 +156,20 @@ export function applyLoginThemeSnapshot() {
   applyTenantTheme(readLoginThemeSnapshot())
 }
 
+<<<<<<< HEAD
 export function applyTenantTheme(settings: TenantSettings | null) {
   if (typeof document === 'undefined') return
   const theme = resolveTheme(settings)
+=======
+type ApplyTenantThemeOptions = {
+  force?: boolean
+}
+
+export function applyTenantTheme(settings: TenantSettings | null, options?: ApplyTenantThemeOptions) {
+  if (typeof document === 'undefined') return
+  const shouldApplyTenantTheme = options?.force === true || appMode === 'catalogo'
+  const theme = resolveTheme(shouldApplyTenantTheme ? settings : null)
+>>>>>>> develop
   const root = document.documentElement
   root.style.setProperty('--color-accent', theme.accent)
   root.style.setProperty('--color-accent-soft', theme.accentSoft)
