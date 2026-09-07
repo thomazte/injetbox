@@ -1,0 +1,100 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [demo, operacao, catalogo]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - run: npm ci
+      - run: node scripts/set-release-version.mjs
+      - run: npm run build
+        env:
+          VITE_APP_MODE: ${{ matrix.mode }}
+      - run: npx cap sync android
+        env:
+          VITE_APP_MODE: ${{ matrix.mode }}
+      - run: chmod +x android/gradlew
+      - run: node scripts/build-android-apk.mjs
+        env:
+          VITE_APP_MODE: ${{ matrix.mode }}
+      - run: mv android/app/build/outputs/apk/debug/InjetBox.apk android/app/build/outputs/apk/debug/InjetBox-${{ matrix.mode }}.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: injetbox-android-${{ matrix.mode }}
+          path: android/app/build/outputs/apk/debug/InjetBox-${{ matrix.mode }}.apk
+
+  desktop:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [demo, operacao, catalogo]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node scripts/set-release-version.mjs
+      - run: npm run desktop:build
+        env:
+          VITE_APP_MODE: ${{ matrix.mode }}
+      - shell: pwsh
+        run: |
+          $exe = Get-ChildItem release -Filter *.exe | Select-Object -First 1
+          if (-not $exe) { throw "Arquivo .exe não encontrado" }
+          $newName = "$($exe.BaseName)-${{ matrix.mode }}.exe"
+          Rename-Item -Path $exe.FullName -NewName $newName
+      - uses: actions/upload-artifact@v4
+        with:
+          name: injetbox-windows-${{ matrix.mode }}
+          path: release/*-${{ matrix.mode }}.exe
+
+  publish:
+    needs: [android, desktop]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+      - uses: softprops/action-gh-release@v2
+        id: publish
+        continue-on-error: true
+        with:
+          files: |
+            injetbox-android-*/InjetBox-*.apk
+            injetbox-windows-*/*.exe
+          generate_release_notes: true
+          name: InjetBox ${{ github.ref_name }}
+          fail_on_unmatched_files: true
+          overwrite_files: true
+      - if: steps.publish.outcome == 'failure'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            injetbox-android-*/InjetBox-*.apk
+            injetbox-windows-*/*.exe
+          generate_release_notes: true
+          name: InjetBox ${{ github.ref_name }}
+          fail_on_unmatched_files: true
+          overwrite_files: true
