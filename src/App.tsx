@@ -79,11 +79,7 @@ function Gate() {
 }
 
 function Shell() {
-<<<<<<< HEAD
-  const { signOut, name, companyName, tenantSettings, isAdmin, isPlatformAdmin } = useAuth()
-=======
   const { signOut, name, companyName, tenantSettings, isPlatformAdmin } = useAuth()
->>>>>>> develop
   const { lowStock, error } = useInventory()
   const [visualHeaderPreview, setVisualHeaderPreview] = useState<HeaderPreview | null>(null)
   const visibleTabs = useMemo(
@@ -91,17 +87,10 @@ function Shell() {
       tabs.filter((item) => {
         if (item.id === 'alertas') return appFeatures.canSeeAlerts
         if (item.id === 'historico') return appFeatures.canSeeHistory
-<<<<<<< HEAD
-        if (item.id === 'visual') return appFeatures.canManageBranding && (isAdmin || isPlatformAdmin)
-        return true
-      }),
-    [isAdmin, isPlatformAdmin],
-=======
         if (item.id === 'visual') return appFeatures.canManageBranding && isPlatformAdmin
         return true
       }),
     [isPlatformAdmin],
->>>>>>> develop
   )
   const [tab, setTab] = useState<Tab>(visibleTabs[0]?.id ?? 'estoque')
   const titles: Record<Tab, string> = {
@@ -111,18 +100,11 @@ function Shell() {
     visual: 'Visual',
   }
   const displayName = companyName || name
-<<<<<<< HEAD
-  const defaultLogoUrl = normalizeLogoUrl(tenantSettings?.logo_url)
-  const headerName = tab === 'visual' && visualHeaderPreview?.name ? visualHeaderPreview.name : displayName
-  const headerLogoUrl =
-    tab === 'visual' && visualHeaderPreview?.logoUrl
-=======
   const shouldShowHeaderLogo = appMode === 'catalogo' || (tab === 'visual' && isPlatformAdmin)
   const defaultLogoUrl = shouldShowHeaderLogo ? normalizeLogoUrl(tenantSettings?.logo_url) : ''
   const headerName = tab === 'visual' && visualHeaderPreview?.name ? visualHeaderPreview.name : displayName
   const headerLogoUrl =
     shouldShowHeaderLogo && tab === 'visual' && visualHeaderPreview?.logoUrl
->>>>>>> develop
       ? normalizeLogoUrl(visualHeaderPreview.logoUrl)
       : defaultLogoUrl
 
@@ -156,11 +138,7 @@ function Shell() {
           <div>
             <p className="text-sm text-muted">{greeting()}</p>
             <div className="mt-1 flex items-center gap-2.5">
-<<<<<<< HEAD
-              <BrandLogo src={headerLogoUrl} alt={headerName || APP_NAME} size="sm" />
-=======
               {shouldShowHeaderLogo && <BrandLogo src={headerLogoUrl} alt={headerName || APP_NAME} size="sm" />}
->>>>>>> develop
               {headerName && <p className="text-sm font-medium">{headerName}</p>}
             </div>
           </div>
@@ -184,11 +162,7 @@ function Shell() {
           <div className="min-w-0">
             <p className="text-sm text-muted lg:hidden">{greeting()}</p>
             <div className="mt-0.5 flex items-center gap-2.5">
-<<<<<<< HEAD
-              <BrandLogo src={headerLogoUrl} alt={headerName || APP_NAME} />
-=======
               {shouldShowHeaderLogo && <BrandLogo src={headerLogoUrl} alt={headerName || APP_NAME} />}
->>>>>>> develop
               <h1 className="truncate text-[28px] leading-tight font-semibold tracking-tight lg:text-[32px]">
                 {titles[tab] ?? 'InjetBox'}
               </h1>

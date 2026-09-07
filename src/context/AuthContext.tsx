@@ -15,11 +15,7 @@ import {
   readLocalSession,
 } from '../lib/localAuth'
 import { getSupabase, isConfigured } from '../lib/supabase'
-<<<<<<< HEAD
-import { applyLoginThemeSnapshot, applyTenantTheme, saveLoginThemeSnapshot } from '../lib/theme'
-=======
 import { applyTenantTheme, saveLoginThemeSnapshot } from '../lib/theme'
->>>>>>> develop
 import type { Profile, TenantSettings } from '../types'
 
 type AuthUser = {
@@ -112,11 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setTenantId(null)
       setCompanyName('')
       setTenantSettings(null)
-<<<<<<< HEAD
-      applyLoginThemeSnapshot()
-=======
       applyTenantTheme(null)
->>>>>>> develop
       return
     }
 
@@ -162,13 +154,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const label = nextSettings?.company_name?.trim() || profileName
       setCompanyName(label)
       applyTenantTheme(nextSettings)
-<<<<<<< HEAD
-      saveLoginThemeSnapshot(nextSettings)
-=======
       if (typedProfile?.is_admin || typedProfile?.is_platform_admin) {
         saveLoginThemeSnapshot(nextSettings)
       }
->>>>>>> develop
     })()
   }, [session])
 
@@ -193,19 +181,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       notice,
       async saveTenantSettings(input, targetTenantId) {
         setError(null)
-<<<<<<< HEAD
-        if (!isAdmin && !isPlatformAdmin) {
-          throw new Error('Somente administrador pode alterar o visual da empresa.')
-        }
-        const fallbackTenant = tenantId || user?.id || null
-        const effectiveTenant = isPlatformAdmin && targetTenantId ? targetTenantId : fallbackTenant
-=======
         if (!isPlatformAdmin) {
           throw new Error('Somente a conta da plataforma pode alterar o visual do catálogo.')
         }
         const fallbackTenant = tenantId || user?.id || null
         const effectiveTenant = targetTenantId || fallbackTenant
->>>>>>> develop
         if (!effectiveTenant) {
           throw new Error('Tenant não encontrado para salvar o tema.')
         }
@@ -375,11 +355,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setTenantId(null)
           setCompanyName('')
           setTenantSettings(null)
-<<<<<<< HEAD
-          applyLoginThemeSnapshot()
-=======
           applyTenantTheme(null)
->>>>>>> develop
           return
         }
         try {
@@ -394,11 +370,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setTenantId(null)
         setCompanyName('')
         setTenantSettings(null)
-<<<<<<< HEAD
-        applyLoginThemeSnapshot()
-=======
         applyTenantTheme(null)
->>>>>>> develop
       },
     }),
     [
