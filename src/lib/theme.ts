@@ -32,6 +32,8 @@ const defaults: ThemeVars = {
   zeroText: '#ffffff',
 }
 
+const LOGIN_THEME_CACHE_KEY = 'injetbox:login-theme:v1'
+
 function toSoft(color: string): string {
   const hex = color.replace('#', '').trim()
   if (!/^[a-fA-F0-9]{6}$/.test(hex)) return defaults.accentSoft
@@ -59,6 +61,79 @@ function resolveTheme(settings: TenantSettings | null): ThemeVars {
     zeroBg: settings.stock_zero_color || defaults.zeroBg,
     zeroText: settings.stock_zero_text_color || defaults.zeroText,
   }
+}
+
+function cleanColor(input: unknown): string | null {
+  if (typeof input !== 'string') return null
+  const value = input.trim()
+  return value || null
+}
+
+export function saveLoginThemeSnapshot(settings: TenantSettings | null) {
+  if (typeof window === 'undefined') return
+  if (!settings) {
+    window.localStorage.removeItem(LOGIN_THEME_CACHE_KEY)
+    return
+  }
+  const snapshot: TenantSettings = {
+    tenant_id: settings.tenant_id || 'login-theme',
+    company_name: typeof settings.company_name === 'string' ? settings.company_name : null,
+    logo_url: null,
+    primary_color: cleanColor(settings.primary_color),
+    primary_soft_color: cleanColor(settings.primary_soft_color),
+    background_color: cleanColor(settings.background_color),
+    background_alt_color: cleanColor(settings.background_alt_color),
+    surface_color: cleanColor(settings.surface_color),
+    text_color: cleanColor(settings.text_color),
+    muted_color: cleanColor(settings.muted_color),
+    stock_ok_color: cleanColor(settings.stock_ok_color),
+    stock_ok_text_color: cleanColor(settings.stock_ok_text_color),
+    stock_low_color: cleanColor(settings.stock_low_color),
+    stock_low_text_color: cleanColor(settings.stock_low_text_color),
+    stock_zero_color: cleanColor(settings.stock_zero_color),
+    stock_zero_text_color: cleanColor(settings.stock_zero_text_color),
+    updated_at: typeof settings.updated_at === 'string' ? settings.updated_at : null,
+  }
+  try {
+    window.localStorage.setItem(LOGIN_THEME_CACHE_KEY, JSON.stringify(snapshot))
+  } catch {
+    /* sem storage disponível, ignora */
+  }
+}
+
+export function readLoginThemeSnapshot(): TenantSettings | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = window.localStorage.getItem(LOGIN_THEME_CACHE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as Partial<TenantSettings> | null
+    if (!parsed || typeof parsed !== 'object') return null
+    return {
+      tenant_id: typeof parsed.tenant_id === 'string' && parsed.tenant_id.trim() ? parsed.tenant_id : 'login-theme',
+      company_name: typeof parsed.company_name === 'string' ? parsed.company_name : null,
+      logo_url: null,
+      primary_color: cleanColor(parsed.primary_color),
+      primary_soft_color: cleanColor(parsed.primary_soft_color),
+      background_color: cleanColor(parsed.background_color),
+      background_alt_color: cleanColor(parsed.background_alt_color),
+      surface_color: cleanColor(parsed.surface_color),
+      text_color: cleanColor(parsed.text_color),
+      muted_color: cleanColor(parsed.muted_color),
+      stock_ok_color: cleanColor(parsed.stock_ok_color),
+      stock_ok_text_color: cleanColor(parsed.stock_ok_text_color),
+      stock_low_color: cleanColor(parsed.stock_low_color),
+      stock_low_text_color: cleanColor(parsed.stock_low_text_color),
+      stock_zero_color: cleanColor(parsed.stock_zero_color),
+      stock_zero_text_color: cleanColor(parsed.stock_zero_text_color),
+      updated_at: typeof parsed.updated_at === 'string' ? parsed.updated_at : null,
+    }
+  } catch {
+    return null
+  }
+}
+
+export function applyLoginThemeSnapshot() {
+  applyTenantTheme(readLoginThemeSnapshot())
 }
 
 export function applyTenantTheme(settings: TenantSettings | null) {

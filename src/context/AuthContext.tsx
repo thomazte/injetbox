@@ -15,7 +15,7 @@ import {
   readLocalSession,
 } from '../lib/localAuth'
 import { getSupabase, isConfigured } from '../lib/supabase'
-import { applyTenantTheme } from '../lib/theme'
+import { applyTenantTheme, saveLoginThemeSnapshot } from '../lib/theme'
 import type { Profile, TenantSettings } from '../types'
 
 type AuthUser = {
@@ -154,6 +154,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const label = nextSettings?.company_name?.trim() || profileName
       setCompanyName(label)
       applyTenantTheme(nextSettings)
+      if (typedProfile?.is_admin || typedProfile?.is_platform_admin) {
+        saveLoginThemeSnapshot(nextSettings)
+      }
     })()
   }, [session])
 
@@ -228,6 +231,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setTenantSettings(next)
             setCompanyName(next.company_name || name)
             applyTenantTheme(next)
+            saveLoginThemeSnapshot(next)
           }
           return
         }
@@ -258,6 +262,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setTenantSettings(next)
           setCompanyName(next.company_name?.trim() || name)
           applyTenantTheme(next)
+          saveLoginThemeSnapshot(next)
         }
       },
       async signIn(email, password) {

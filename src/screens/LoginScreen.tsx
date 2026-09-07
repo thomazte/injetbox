@@ -2,7 +2,7 @@ import type { FormEvent } from 'react'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { APP_NAME, APP_TAGLINE } from '../lib/brand'
-import { applyTenantTheme } from '../lib/theme'
+import { applyLoginThemeSnapshot } from '../lib/theme'
 import { CopyrightMark } from '../components/CopyrightMark'
 
 export function LoginScreen() {
@@ -20,8 +20,9 @@ export function LoginScreen() {
   }, [notice])
 
   useEffect(() => {
-    // Sem tenant autenticado: login sempre no visual padrão do app.
-    applyTenantTheme(null)
+    // Antes de autenticar, tenta reaplicar o último visual salvo do tenant/admin.
+    // Se não houver cache, cai no padrão do app automaticamente.
+    applyLoginThemeSnapshot()
   }, [])
 
   async function onSubmit(event: FormEvent) {
