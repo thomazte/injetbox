@@ -28,12 +28,24 @@ export function MovementSheet({
   const [minQuantity, setMinQuantity] = useState(String(product.min_quantity))
   const [unit, setUnit] = useState(product.unit)
   const status = stockStatus(product)
-  const well =
+  const statusStyle =
     status === 'zerado'
-      ? 'bg-ink text-paper'
+      ? {
+          background:
+            'linear-gradient(180deg, color-mix(in srgb, var(--status-zero-bg) 82%, white 18%) 0%, var(--status-zero-bg) 100%)',
+          color: 'var(--status-zero-text)',
+        }
       : status === 'baixo'
-        ? 'bg-accent text-paper'
-        : 'bg-accent-soft text-accent'
+        ? {
+            background:
+              'linear-gradient(180deg, color-mix(in srgb, var(--status-low-bg) 82%, white 18%) 0%, var(--status-low-bg) 100%)',
+            color: 'var(--status-low-text)',
+          }
+        : {
+            background:
+              'linear-gradient(180deg, color-mix(in srgb, var(--status-ok-bg) 82%, white 18%) 0%, var(--status-ok-bg) 100%)',
+            color: 'var(--status-ok-text)',
+          }
 
   async function onMove(event: FormEvent) {
     event.preventDefault()
@@ -106,7 +118,7 @@ export function MovementSheet({
             <h2 className="mt-1 text-xl font-semibold tracking-tight">{productTitle(product)}</h2>
             {product.brand && <p className="mt-1 text-sm text-muted">{product.brand}</p>}
           </div>
-          <div className={`rounded-2xl px-4 py-3 text-center ${well}`}>
+          <div className="rounded-2xl px-4 py-3 text-center" style={statusStyle}>
             <p className="font-mono text-3xl leading-none font-semibold">{product.quantity}</p>
             <p className="mt-1 text-[10px] font-semibold tracking-wide uppercase">
               {statusLabel(status)} · {product.unit}

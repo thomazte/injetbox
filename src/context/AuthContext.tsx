@@ -16,7 +16,7 @@ import {
 } from '../lib/localAuth'
 import { getSupabase, isConfigured } from '../lib/supabase'
 import { applyTenantTheme } from '../lib/theme'
-import type { TenantSettings } from '../types'
+import type { Profile, TenantSettings } from '../types'
 
 type AuthUser = {
   id: string
@@ -27,12 +27,18 @@ type AuthContextValue = {
   user: AuthUser | null
   session: Session | null
   name: string
+  isAdmin: boolean
+  isPlatformAdmin: boolean
   tenantId: string | null
   companyName: string
   tenantSettings: TenantSettings | null
   loading: boolean
   error: string | null
   notice: string | null
+  saveTenantSettings: (
+    input: Partial<Omit<TenantSettings, 'tenant_id'>>,
+    targetTenantId?: string,
+  ) => Promise<void>
   signIn: (email: string, password: string) => Promise<void>
   signUp: (name: string, email: string, password: string) => Promise<void>
   signOut: () => Promise<void>
@@ -44,6 +50,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [localUser, setLocalUser] = useState<AuthUser | null>(null)
   const [name, setName] = useState('')
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [isPlatformAdmin, setIsPlatformAdmin] = useState(false)
   const [tenantId, setTenantId] = useState<string | null>(null)
   const [companyName, setCompanyName] = useState('')
   const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
@@ -56,6 +64,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const restored = readLocalSession()
       setLocalUser(restored ? { id: restored.id, email: restored.email } : null)
       setName(restored?.name ?? '')
+      setIsAdmin(true)
+      setIsPlatformAdmin(true)
       setTenantId(restored?.id ?? null)
       setCompanyName(restored?.name ?? '')
       setTenantSettings(null)
@@ -93,6 +103,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const user = session?.user
     if (!user) {
       setName('')
+      setIsAdmin(false)
+      setIsPlatformAdmin(false)
       setTenantId(null)
       setCompanyName('')
       setTenantSettings(null)
@@ -110,13 +122,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const client = getSupabase()
       const { data: profile } = await client
         .from('profiles')
-        .select('name, tenant_id')
+        .select('name, tenant_id, is_admin, is_platform_admin')
         .eq('id', user.id)
         .maybeSingle()
 
-      const profileName = typeof profile?.name === 'string' && profile.name.trim() ? profile.name : fallback
+      const typedProfile = profile as Profile | null
+      const profileName = typeof typedProfile?.name === 'string' && typedProfile.name.trim() ? typedProfile.name : fallback
       setName(profileName)
-      const nextTenantId = profile?.tenant_id ?? null
+      setIsAdmin(Boolean(typedProfile?.is_admin))
+      setIsPlatformAdmin(Boolean(typedProfile?.is_platform_admin))
+      const nextTenantId = typedProfile?.tenant_id ?? null
       setTenantId(nextTenantId)
 
       if (!nextTenantId) {
@@ -129,7 +144,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data: settings } = await client
         .from('tenant_settings')
         .select(
-          'tenant_id, company_name, logo_url, primary_color, primary_soft_color, background_color, text_color, muted_color',
+          'tenant_id, company_name, logo_url, primary_color, primary_soft_color, background_color, background_alt_color, surface_color, text_color, muted_color, stock_ok_color, stock_ok_text_color, stock_low_color, stock_low_text_color, stock_zero_color, stock_zero_text_color',
         )
         .eq('tenant_id', nextTenantId)
         .maybeSingle()
@@ -153,12 +168,98 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       session,
       name,
+      isAdmin,
+      isPlatformAdmin,
       tenantId,
       companyName,
       tenantSettings,
       loading,
       error,
       notice,
+      async saveTenantSettings(input, targetTenantId) {
+        setError(null)
+        if (!isAdmin && !isPlatformAdmin) {
+          throw new Error('Somente administrador pode alterar o visual da empresa.')
+        }
+        const fallbackTenant = tenantId || user?.id || null
+        const effectiveTenant = isPlatformAdmin && targetTenantId ? targetTenantId : fallbackTenant
+        if (!effectiveTenant) {
+          throw new Error('Tenant não encontrado para salvar o tema.')
+        }
+
+        const cleaned = {
+          company_name: input.company_name?.trim() || null,
+          logo_url: input.logo_url?.trim() || null,
+          primary_color: input.primary_color?.trim() || null,
+          primary_soft_color: input.primary_soft_color?.trim() || null,
+          background_color: input.background_color?.trim() || null,
+          background_alt_color: input.background_alt_color?.trim() || null,
+          surface_color: input.surface_color?.trim() || null,
+          text_color: input.text_color?.trim() || null,
+          muted_color: input.muted_color?.trim() || null,
+          stock_ok_color: input.stock_ok_color?.trim() || null,
+          stock_ok_text_color: input.stock_ok_text_color?.trim() || null,
+          stock_low_color: input.stock_low_color?.trim() || null,
+          stock_low_text_color: input.stock_low_text_color?.trim() || null,
+          stock_zero_color: input.stock_zero_color?.trim() || null,
+          stock_zero_text_color: input.stock_zero_text_color?.trim() || null,
+        }
+
+        if (!isConfigured) {
+          const next: TenantSettings = {
+            tenant_id: effectiveTenant,
+            company_name: cleaned.company_name,
+            logo_url: cleaned.logo_url,
+            primary_color: cleaned.primary_color,
+            primary_soft_color: cleaned.primary_soft_color,
+            background_color: cleaned.background_color,
+            text_color: cleaned.text_color,
+            muted_color: cleaned.muted_color,
+            background_alt_color: cleaned.background_alt_color,
+            surface_color: cleaned.surface_color,
+            stock_ok_color: cleaned.stock_ok_color,
+            stock_ok_text_color: cleaned.stock_ok_text_color,
+            stock_low_color: cleaned.stock_low_color,
+            stock_low_text_color: cleaned.stock_low_text_color,
+            stock_zero_color: cleaned.stock_zero_color,
+            stock_zero_text_color: cleaned.stock_zero_text_color,
+          }
+          if (effectiveTenant === tenantId) {
+            setTenantSettings(next)
+            setCompanyName(next.company_name || name)
+            applyTenantTheme(next)
+          }
+          return
+        }
+
+        const client = getSupabase()
+        const { data, error: nextError } = await client
+          .from('tenant_settings')
+          .upsert(
+            {
+              tenant_id: effectiveTenant,
+              ...cleaned,
+              updated_at: new Date().toISOString(),
+            },
+            { onConflict: 'tenant_id' },
+          )
+          .select(
+            'tenant_id, company_name, logo_url, primary_color, primary_soft_color, background_color, background_alt_color, surface_color, text_color, muted_color, stock_ok_color, stock_ok_text_color, stock_low_color, stock_low_text_color, stock_zero_color, stock_zero_text_color',
+          )
+          .single()
+
+        if (nextError) {
+          setError(nextError.message)
+          throw new Error(nextError.message)
+        }
+
+        const next = data as TenantSettings
+        if (effectiveTenant === tenantId) {
+          setTenantSettings(next)
+          setCompanyName(next.company_name?.trim() || name)
+          applyTenantTheme(next)
+        }
+      },
       async signIn(email, password) {
         setError(null)
         setNotice(null)
@@ -169,6 +270,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const next = await localSignIn(cleanEmail, cleanPassword)
             setLocalUser({ id: next.id, email: next.email })
             setName(next.name)
+            setIsAdmin(true)
+            setIsPlatformAdmin(true)
             setTenantId(next.id)
             setCompanyName(next.name)
             setTenantSettings(null)
@@ -203,6 +306,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const next = await localSignUp(nextName, cleanEmail, cleanPassword)
             setLocalUser({ id: next.id, email: next.email })
             setName(next.name)
+            setIsAdmin(true)
+            setIsPlatformAdmin(true)
             setTenantId(next.id)
             setCompanyName(next.name)
             setTenantSettings(null)
@@ -240,6 +345,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           clearLocalSession()
           setLocalUser(null)
           setName('')
+          setIsAdmin(false)
+          setIsPlatformAdmin(false)
           setTenantId(null)
           setCompanyName('')
           setTenantSettings(null)
@@ -253,13 +360,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         setSession(null)
         setName('')
+        setIsAdmin(false)
+        setIsPlatformAdmin(false)
         setTenantId(null)
         setCompanyName('')
         setTenantSettings(null)
         applyTenantTheme(null)
       },
     }),
-    [user, session, name, tenantId, companyName, tenantSettings, loading, error, notice],
+    [
+      user,
+      session,
+      name,
+      isAdmin,
+      isPlatformAdmin,
+      tenantId,
+      companyName,
+      tenantSettings,
+      loading,
+      error,
+      notice,
+    ],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

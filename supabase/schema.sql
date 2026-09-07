@@ -20,6 +20,8 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   tenant_id uuid not null references public.tenants (id) on delete cascade,
   name text not null,
+  is_admin boolean not null default false,
+  is_platform_admin boolean not null default false,
   created_at timestamptz not null default now()
 );
 
@@ -30,8 +32,16 @@ create table if not exists public.tenant_settings (
   primary_color text,
   primary_soft_color text,
   background_color text,
+  background_alt_color text,
+  surface_color text,
   text_color text,
   muted_color text,
+  stock_ok_color text,
+  stock_ok_text_color text,
+  stock_low_color text,
+  stock_low_text_color text,
+  stock_zero_color text,
+  stock_zero_text_color text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -76,9 +86,29 @@ create index if not exists movements_created_at_idx on public.movements (created
 create or replace function public.current_tenant_id()
 returns uuid
 language sql
+security definer
 stable
+set search_path = public
 as $$
   select tenant_id from public.profiles where id = auth.uid() limit 1
+$$;
+
+create or replace function public.is_platform_admin()
+returns boolean
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select coalesce(
+    (
+      select p.is_platform_admin
+      from public.profiles p
+      where p.id = auth.uid()
+      limit 1
+    ),
+    false
+  )
 $$;
 
 alter table public.tenants enable row level security;
@@ -91,7 +121,8 @@ drop policy if exists "tenants_own_select" on public.tenants;
 create policy "tenants_own_select" on public.tenants
   for select to authenticated
   using (
-    exists (
+    public.is_platform_admin()
+    or exists (
       select 1
       from public.profiles p
       where p.id = auth.uid()
@@ -104,35 +135,45 @@ create policy "profiles_select_own" on public.profiles
   for select to authenticated using (id = auth.uid());
 
 drop policy if exists "profiles_update_own" on public.profiles;
-create policy "profiles_update_own" on public.profiles
-  for update to authenticated using (id = auth.uid());
+-- Sem policy de update direto em profiles para evitar elevação de privilégio de admin.
+
+drop policy if exists "profiles_update_platform_admin" on public.profiles;
+create policy "profiles_update_platform_admin" on public.profiles
+  for update to authenticated
+  using (public.is_platform_admin())
+  with check (public.is_platform_admin());
 
 drop policy if exists "tenant_settings_own_select" on public.tenant_settings;
 create policy "tenant_settings_own_select" on public.tenant_settings
   for select to authenticated
-  using (tenant_id = public.current_tenant_id());
+  using (tenant_id = public.current_tenant_id() or public.is_platform_admin());
 
 drop policy if exists "tenant_settings_own_update" on public.tenant_settings;
 create policy "tenant_settings_own_update" on public.tenant_settings
   for update to authenticated
-  using (tenant_id = public.current_tenant_id())
-  with check (tenant_id = public.current_tenant_id());
+  using (tenant_id = public.current_tenant_id() or public.is_platform_admin())
+  with check (tenant_id = public.current_tenant_id() or public.is_platform_admin());
+
+drop policy if exists "tenant_settings_own_insert" on public.tenant_settings;
+create policy "tenant_settings_own_insert" on public.tenant_settings
+  for insert to authenticated
+  with check (tenant_id = public.current_tenant_id() or public.is_platform_admin());
 
 drop policy if exists "products_tenant_all" on public.products;
 create policy "products_tenant_all" on public.products
   for all to authenticated
-  using (tenant_id = public.current_tenant_id())
-  with check (tenant_id = public.current_tenant_id());
+  using (tenant_id = public.current_tenant_id() or public.is_platform_admin())
+  with check (tenant_id = public.current_tenant_id() or public.is_platform_admin());
 
 drop policy if exists "movements_tenant_select" on public.movements;
 create policy "movements_tenant_select" on public.movements
   for select to authenticated
-  using (tenant_id = public.current_tenant_id());
+  using (tenant_id = public.current_tenant_id() or public.is_platform_admin());
 
 drop policy if exists "movements_tenant_insert" on public.movements;
 create policy "movements_tenant_insert" on public.movements
   for insert to authenticated
-  with check (tenant_id = public.current_tenant_id());
+  with check (tenant_id = public.current_tenant_id() or public.is_platform_admin());
 
 create or replace function public.handle_new_user()
 returns trigger
@@ -147,8 +188,8 @@ begin
   insert into public.tenants (id, name)
   values (v_tenant_id, v_name);
 
-  insert into public.profiles (id, tenant_id, name)
-  values (new.id, v_tenant_id, v_name);
+  insert into public.profiles (id, tenant_id, name, is_admin)
+  values (new.id, v_tenant_id, v_name, true);
 
   insert into public.tenant_settings (tenant_id, company_name)
   values (v_tenant_id, v_name);

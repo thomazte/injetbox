@@ -3,17 +3,33 @@ import type { TenantSettings } from '../types'
 type ThemeVars = {
   accent: string
   accentSoft: string
-  paper: string
+  background: string
+  backgroundAlt: string
+  surface: string
   ink: string
   muted: string
+  okBg: string
+  okText: string
+  lowBg: string
+  lowText: string
+  zeroBg: string
+  zeroText: string
 }
 
 const defaults: ThemeVars = {
   accent: '#ff6a00',
   accentSoft: 'rgba(255, 106, 0, 0.18)',
-  paper: '#0a0a0a',
+  background: '#0a0a0a',
+  backgroundAlt: '#070707',
+  surface: '#161616',
   ink: '#ffffff',
   muted: '#c4c4c4',
+  okBg: 'rgba(255, 106, 0, 0.18)',
+  okText: '#ff6a00',
+  lowBg: '#ff6a00',
+  lowText: '#ffffff',
+  zeroBg: '#101010',
+  zeroText: '#ffffff',
 }
 
 function toSoft(color: string): string {
@@ -31,9 +47,17 @@ function resolveTheme(settings: TenantSettings | null): ThemeVars {
   return {
     accent,
     accentSoft: settings.primary_soft_color || toSoft(accent),
-    paper: settings.background_color || defaults.paper,
+    background: settings.background_color || defaults.background,
+    backgroundAlt: settings.background_alt_color || defaults.backgroundAlt,
+    surface: settings.surface_color || defaults.surface,
     ink: settings.text_color || defaults.ink,
     muted: settings.muted_color || defaults.muted,
+    okBg: settings.stock_ok_color || defaults.okBg,
+    okText: settings.stock_ok_text_color || defaults.okText,
+    lowBg: settings.stock_low_color || defaults.lowBg,
+    lowText: settings.stock_low_text_color || defaults.lowText,
+    zeroBg: settings.stock_zero_color || defaults.zeroBg,
+    zeroText: settings.stock_zero_text_color || defaults.zeroText,
   }
 }
 
@@ -47,9 +71,18 @@ export function applyTenantTheme(settings: TenantSettings | null) {
   root.style.setProperty('--color-warn-soft', theme.accentSoft)
   root.style.setProperty('--color-danger', theme.accent)
   root.style.setProperty('--color-danger-soft', theme.accentSoft)
-  root.style.setProperty('--color-ok', theme.accent)
-  root.style.setProperty('--color-ok-soft', theme.accentSoft)
-  root.style.setProperty('--color-paper', theme.paper)
+  root.style.setProperty('--color-ok', theme.okText)
+  root.style.setProperty('--color-ok-soft', theme.okBg)
+  root.style.setProperty('--color-paper', theme.background)
   root.style.setProperty('--color-ink', theme.ink)
   root.style.setProperty('--color-muted', theme.muted)
+  root.style.setProperty('--app-bg', theme.background)
+  root.style.setProperty('--app-bg-alt', theme.backgroundAlt)
+  root.style.setProperty('--app-surface', theme.surface)
+  root.style.setProperty('--status-ok-bg', theme.okBg)
+  root.style.setProperty('--status-ok-text', theme.okText)
+  root.style.setProperty('--status-low-bg', theme.lowBg)
+  root.style.setProperty('--status-low-text', theme.lowText)
+  root.style.setProperty('--status-zero-bg', theme.zeroBg)
+  root.style.setProperty('--status-zero-text', theme.zeroText)
 }

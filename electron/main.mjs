@@ -3,6 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const electronDir = path.dirname(fileURLToPath(import.meta.url))
+const appIconPath = path.join(electronDir, '../public/icon-512.png')
 
 function createWindow() {
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
@@ -26,7 +27,7 @@ function createWindow() {
     backgroundColor: '#0a0a0a',
     autoHideMenuBar: true,
     show: false,
-    icon: path.join(electronDir, '../public/icon-512.png'),
+    icon: appIconPath,
     webPreferences: {
       preload: path.join(electronDir, 'preload.mjs'),
       contextIsolation: true,
@@ -48,6 +49,9 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  if (process.platform === 'win32') {
+    app.setAppUserModelId('br.injetbox.app')
+  }
   createWindow()
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

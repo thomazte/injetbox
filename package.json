@@ -29,10 +29,11 @@
     "files": [
       "dist/**/*",
       "electron/**/*",
-      "public/icon-512.png"
+      "public/icon-512.png",
+      "public/icon.ico"
     ],
     "win": {
-      "icon": "public/icon-512.png",
+      "icon": "public/icon.ico",
       "signAndEditExecutable": false,
       "target": [
         {
