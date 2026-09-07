@@ -10,7 +10,7 @@ async function setupNativeShell() {
   if (!Capacitor.isNativePlatform()) return
   try {
     await StatusBar.setStyle({ style: Style.Light })
-    await StatusBar.setBackgroundColor({ color: '#0a0a0a' })
+    await StatusBar.setBackgroundColor({ color: '#0B1220' })
     await SplashScreen.hide()
   } catch {
     /* plugins only exist no Android/iOS */

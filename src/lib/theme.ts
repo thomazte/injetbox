@@ -18,19 +18,19 @@ type ThemeVars = {
 }
 
 const defaults: ThemeVars = {
-  accent: '#ff6a00',
-  accentSoft: 'rgba(255, 106, 0, 0.18)',
-  background: '#0a0a0a',
-  backgroundAlt: '#070707',
-  surface: '#161616',
-  ink: '#ffffff',
-  muted: '#c4c4c4',
-  okBg: 'rgba(255, 106, 0, 0.18)',
-  okText: '#ff6a00',
-  lowBg: '#ff6a00',
-  lowText: '#ffffff',
-  zeroBg: '#101010',
-  zeroText: '#ffffff',
+  accent: '#2563EB',
+  accentSoft: 'rgba(37, 99, 235, 0.18)',
+  background: '#0B1220',
+  backgroundAlt: '#111827',
+  surface: '#1F2937',
+  ink: '#F9FAFB',
+  muted: '#9CA3AF',
+  okBg: '#1E3A8A',
+  okText: '#DBEAFE',
+  lowBg: '#2563EB',
+  lowText: '#000000',
+  zeroBg: '#FFFFFF',
+  zeroText: '#000000',
 }
 
 const LOGIN_THEME_CACHE_KEY = 'injetbox:login-theme:v1'
