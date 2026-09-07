@@ -1,6 +1,23 @@
 import fs from 'node:fs'
+import { execSync } from 'node:child_process'
 
-const raw = process.env.GITHUB_REF_NAME || process.argv[2] || ''
+function readHeadTag() {
+  try {
+    const output = execSync('git tag --points-at HEAD', { stdio: ['ignore', 'pipe', 'ignore'] })
+      .toString()
+      .trim()
+    if (!output) return ''
+    const firstMatch = output
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .find((line) => /^v\d+\.\d+\.\d+$/.test(line))
+    return firstMatch || ''
+  } catch {
+    return ''
+  }
+}
+
+const raw = process.env.GITHUB_REF_NAME || process.argv[2] || readHeadTag()
 const version = raw.replace(/^v/i, '')
 
 if (!/^\d+\.\d+\.\d+$/.test(version)) {
