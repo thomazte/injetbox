@@ -2,6 +2,7 @@ import type { FormEvent } from 'react'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { APP_NAME, APP_TAGLINE } from '../lib/brand'
+import { applyTenantTheme } from '../lib/theme'
 import { CopyrightMark } from '../components/CopyrightMark'
 
 export function LoginScreen() {
@@ -17,6 +18,11 @@ export function LoginScreen() {
   useEffect(() => {
     if (notice) setMode('entrar')
   }, [notice])
+
+  useEffect(() => {
+    // Sem tenant autenticado: login sempre no visual padrão do app.
+    applyTenantTheme(null)
+  }, [])
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault()

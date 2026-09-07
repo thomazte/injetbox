@@ -71,7 +71,6 @@ export function BrandingScreen({
   const [themeUpdatedAt, setThemeUpdatedAt] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [logoPreviewError, setLogoPreviewError] = useState(false)
 
   function fillClassicTheme() {
     setPrimary('#2563EB')
@@ -158,10 +157,6 @@ export function BrandingScreen({
       setLoadingTenant(false)
     })()
   }, [mode, selectedTenantId, tenants])
-
-  useEffect(() => {
-    setLogoPreviewError(false)
-  }, [logoUrl])
 
   useEffect(() => {
     if (!onHeaderPreviewChange) return
@@ -322,7 +317,7 @@ export function BrandingScreen({
     <div className="mx-4 rounded-3xl border border-white/10 bg-white/5 p-4 lg:mx-8 lg:p-6">
       <h2 className="text-xl font-semibold tracking-tight">Visual da empresa</h2>
       <p className="mt-1 text-sm text-muted">
-        Ajuste nome, logo e cores do estabelecimento. O app aplica na hora para este tenant.
+        Ajuste nome e cores do estabelecimento. O app aplica na hora para este tenant.
       </p>
 
       <form className="mt-5 space-y-3.5" onSubmit={onSubmit}>
@@ -391,32 +386,6 @@ export function BrandingScreen({
         <Field label="Nome da empresa">
           <input value={company} onChange={(event) => setCompany(event.target.value)} placeholder="Renata Peças Diesel" />
         </Field>
-
-        <Field label="URL da logo (opcional)">
-          <input value={logoUrl} onChange={(event) => setLogoUrl(event.target.value)} placeholder="https://..." />
-        </Field>
-        <p className="-mt-1 text-xs text-muted">
-          Dica: use URL direta da imagem (png, jpg, webp, svg). Links de Drive devem estar públicos para "Qualquer pessoa com o link".
-        </p>
-        {logoUrl.trim() && (
-          <div className="glass rounded-2xl p-3.5">
-            <p className="text-[11px] font-semibold tracking-[0.08em] text-muted uppercase">Prévia da logo da empresa selecionada</p>
-            {logoPreviewError ? (
-              <p className="mt-2 text-xs text-warn">
-                Não foi possível carregar esta URL. Verifique se é link direto da imagem e acesso público.
-              </p>
-            ) : (
-              <img
-                src={normalizePreviewLogoUrl(logoUrl)}
-                alt={company || 'Logo da empresa'}
-                className="mt-2 h-16 w-auto max-w-full rounded-lg border border-white/10 bg-transparent object-contain"
-                loading="lazy"
-                decoding="async"
-                onError={() => setLogoPreviewError(true)}
-              />
-            )}
-          </div>
-        )}
 
         <div className="grid gap-3 md:grid-cols-2">
           <Field label="Cor principal">
