@@ -38,8 +38,25 @@ export type TenantSettings = {
   primary_color: string | null
   primary_soft_color: string | null
   background_color: string | null
+  background_alt_color: string | null
+  surface_color: string | null
   text_color: string | null
   muted_color: string | null
+  stock_ok_color: string | null
+  stock_ok_text_color: string | null
+  stock_low_color: string | null
+  stock_low_text_color: string | null
+  stock_zero_color: string | null
+  stock_zero_text_color: string | null
+  updated_at?: string | null
+}
+
+export type Profile = {
+  id: string
+  tenant_id: string
+  name: string
+  is_admin: boolean
+  is_platform_admin?: boolean
 }
 
 export type StockStatus = 'ok' | 'baixo' | 'zerado'

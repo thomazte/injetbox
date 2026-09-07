@@ -9,6 +9,7 @@ export type AppFeatures = {
   canEditProducts: boolean
   canDeleteProducts: boolean
   canMoveStock: boolean
+  canManageBranding: boolean
 }
 
 const modeByName: Record<string, AppMode> = {
@@ -31,6 +32,7 @@ export const appFeaturesByMode: Record<AppMode, AppFeatures> = {
     canEditProducts: true,
     canDeleteProducts: false,
     canMoveStock: true,
+    canManageBranding: true,
   },
   operacao: {
     canSeeAlerts: true,
@@ -41,6 +43,7 @@ export const appFeaturesByMode: Record<AppMode, AppFeatures> = {
     canEditProducts: true,
     canDeleteProducts: true,
     canMoveStock: true,
+    canManageBranding: true,
   },
   catalogo: {
     canSeeAlerts: false,
@@ -51,6 +54,7 @@ export const appFeaturesByMode: Record<AppMode, AppFeatures> = {
     canEditProducts: false,
     canDeleteProducts: false,
     canMoveStock: false,
+    canManageBranding: false,
   },
 }
 

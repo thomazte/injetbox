@@ -1,15 +1,19 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Plus, Search, Upload } from 'lucide-react'
 import { useInventory } from '../context/InventoryContext'
 import { MovementSheet } from '../components/MovementSheet'
 import { ProductCard } from '../components/ProductCard'
 import { ProductForm } from '../components/ProductForm'
-import { appFeatures } from '../lib/appMode'
+import { appFeatures, appMode } from '../lib/appMode'
 import { ImportScreen } from './ImportScreen'
 import type { Product } from '../types'
 
 export function StockScreen() {
   const { products, lowStock, tipos, loading } = useInventory()
+  const catalogMode = appMode === 'catalogo'
+  const canOpenDetails = appFeatures.canMoveStock || appFeatures.canEditProducts || appFeatures.canDeleteProducts
+  const [showInstallHint, setShowInstallHint] = useState(false)
+  const [isIos, setIsIos] = useState(false)
   const [query, setQuery] = useState('')
   const [tipo, setTipo] = useState('Todas')
   const [selected, setSelected] = useState<Product | null>(null)
@@ -27,15 +31,60 @@ export function StockScreen() {
 
   const totalQty = products.reduce((sum, item) => sum + item.quantity, 0)
 
+  useEffect(() => {
+    if (!catalogMode || typeof window === 'undefined') return
+    const isStandalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      ('standalone' in window.navigator && window.navigator.standalone === true)
+    const userAgent = window.navigator.userAgent.toLowerCase()
+    const iosDevice = /iphone|ipad|ipod/.test(userAgent)
+    const dismissed = window.sessionStorage.getItem('catalog.install.hint.dismissed') === '1'
+    setIsIos(iosDevice)
+    setShowInstallHint(!isStandalone && !dismissed)
+  }, [catalogMode])
+
+  function dismissInstallHint() {
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.setItem('catalog.install.hint.dismissed', '1')
+    }
+    setShowInstallHint(false)
+  }
+
   return (
     <div className="pb-4 lg:pb-0">
-      <section className="grid grid-cols-3 gap-2 px-4 lg:gap-4 lg:px-4">
-        <Kpi label="Itens" value={String(products.length)} />
-        <Kpi label="Peças" value={String(totalQty)} />
-        <Kpi label="Alertas" value={String(lowStock.length)} warn={lowStock.length > 0} />
-      </section>
+      {catalogMode && showInstallHint && (
+        <section className="px-4 pt-2">
+          <div className="glass rounded-2xl p-3.5">
+            <p className="text-sm font-semibold">Adicionar na tela inicial</p>
+            {isIos ? (
+              <p className="mt-1 text-xs text-muted">
+                No Safari: toque em Compartilhar e depois em Adicionar a Tela de Início.
+              </p>
+            ) : (
+              <p className="mt-1 text-xs text-muted">
+                No navegador: abra o menu e escolha Instalar app ou Adicionar a tela inicial.
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={dismissInstallHint}
+              className="mt-3 rounded-xl bg-accent px-3 py-2 text-xs font-semibold text-white"
+            >
+              Entendi
+            </button>
+          </div>
+        </section>
+      )}
 
-      <div className="mt-4 flex flex-col gap-3 px-4 lg:mt-6 lg:flex-row lg:items-center">
+      {!catalogMode && (
+        <section className="grid grid-cols-3 gap-2 px-4 lg:gap-4 lg:px-4">
+          <Kpi label="Itens" value={String(products.length)} />
+          <Kpi label="Peças" value={String(totalQty)} />
+          <Kpi label="Alertas" value={String(lowStock.length)} warn={lowStock.length > 0} />
+        </section>
+      )}
+
+      <div className={`flex flex-col gap-3 px-4 lg:flex-row lg:items-center ${catalogMode ? 'mt-2 lg:mt-3' : 'mt-4 lg:mt-6'}`}>
         <div className="relative flex-1">
           <Search
             size={18}
@@ -74,20 +123,22 @@ export function StockScreen() {
         )}
       </div>
 
-      <div className="no-scrollbar mt-3 flex gap-2 overflow-x-auto px-4 pb-1 lg:mt-4">
-        {['Todas', ...tipos].map((item) => (
-          <button
-            key={item}
-            type="button"
-            onClick={() => setTipo(item)}
-            className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium ${
-              tipo === item ? 'bg-accent text-white' : 'glass text-muted'
-            }`}
-          >
-            {item}
-          </button>
-        ))}
-      </div>
+      {!catalogMode && (
+        <div className="no-scrollbar mt-3 flex gap-2 overflow-x-auto px-4 pb-1 lg:mt-4">
+          {['Todas', ...tipos].map((item) => (
+            <button
+              key={item}
+              type="button"
+              onClick={() => setTipo(item)}
+              className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium ${
+                tipo === item ? 'bg-accent text-white' : 'glass text-muted'
+              }`}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      )}
 
       {(appFeatures.canCreateProducts || appFeatures.canImportProducts) && (
         <div className="mt-4 flex gap-2 px-4 lg:hidden">
@@ -129,13 +180,17 @@ export function StockScreen() {
         <ul className="mt-4 grid grid-cols-1 gap-2.5 px-4 lg:grid-cols-2 xl:grid-cols-3">
           {filtered.map((product) => (
             <li key={product.id}>
-              <ProductCard product={product} onOpen={() => setSelected(product)} />
+              <ProductCard
+                product={product}
+                catalogView={catalogMode}
+                onOpen={canOpenDetails ? () => setSelected(product) : undefined}
+              />
             </li>
           ))}
         </ul>
       )}
 
-      {selected && (
+      {canOpenDetails && selected && (
         <MovementSheet
           product={products.find((item) => item.id === selected.id) ?? selected}
           onClose={() => setSelected(null)}
