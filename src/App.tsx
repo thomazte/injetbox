@@ -27,7 +27,7 @@ const ibbDirectById: Record<string, string> = {
   mCgGmCp1: 'https://i.ibb.co/HD3V0DZ1/rpd-logo-Photoroom.png',
 }
 const renataCatalogLogoUrl = ibbDirectById.mCgGmCp1
-const stockTitleLogoUrl = '/zamohtexe-logo.png'
+const stockTitleLogoUrl = renataCatalogLogoUrl
 
 function resolveIbbDirectUrl(url: URL): string | null {
   const token = url.pathname.split('/').filter(Boolean)[0]
@@ -176,7 +176,6 @@ function Shell() {
           <div>
             <p className="text-sm text-muted">{greeting()}</p>
             <div className="mt-1 flex items-center gap-2.5">
-              {shouldShowHeaderLogo && <BrandLogo src={headerLogoUrl} alt={headerName || APP_NAME} size="sm" />}
               {headerName && <p className="text-sm font-medium">{headerName}</p>}
             </div>
           </div>
@@ -249,45 +248,17 @@ function Shell() {
   )
 }
 
-function BrandLogo({ src, alt, size = 'md' }: { src: string; alt: string; size?: 'sm' | 'md' }) {
+function StockTitleLogo({ src, alt }: { src: string; alt: string }) {
   const [failed, setFailed] = useState(false)
-  const dimension = size === 'sm' ? 'h-8 w-8 rounded-lg' : 'h-9 w-9 rounded-xl'
-
   useEffect(() => {
     setFailed(false)
   }, [src])
 
-  if (!src || failed) {
-    return (
-      <span
-        aria-hidden="true"
-        className={`glass inline-flex shrink-0 items-center justify-center ${dimension} text-[10px] font-semibold text-muted`}
-      >
-        IB
-      </span>
-    )
-  }
+  const safeSrc = failed || !src ? '/favicon.svg' : src
 
   return (
     <img
-      src={src}
-      alt={alt}
-      className={`shrink-0 border border-white/10 bg-transparent object-contain ${dimension}`}
-      loading="lazy"
-      decoding="async"
-      onError={() => setFailed(true)}
-    />
-  )
-}
-
-function StockTitleLogo({ src, alt }: { src: string; alt: string }) {
-  const [failed, setFailed] = useState(false)
-  if (!src || failed) {
-    return <BrandLogo src="/favicon.svg" alt={alt} />
-  }
-  return (
-    <img
-      src={src}
+      src={safeSrc}
       alt={alt}
       className="h-10 w-10 rounded-lg bg-transparent object-cover"
       loading="lazy"
