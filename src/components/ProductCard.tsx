@@ -35,7 +35,7 @@ export function ProductCard({
   const body = (
     <>
       <span className="flex min-w-0 flex-1 flex-col justify-center px-4 py-3.5">
-        {!catalogView && meta && (
+        {meta && (
           <span className="text-[11px] font-semibold tracking-[0.08em] text-muted uppercase">
             {meta}
           </span>

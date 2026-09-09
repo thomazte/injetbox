@@ -16,11 +16,25 @@ type HeaderPreview = {
   logoUrl: string
 }
 
+const ibbDirectById: Record<string, string> = {
+  mCgGmCp1: 'https://i.ibb.co/HD3V0DZ1/rpd-logo-Photoroom.png',
+}
+
+function resolveIbbDirectUrl(url: URL): string | null {
+  const token = url.pathname.split('/').filter(Boolean)[0]
+  if (!token) return null
+  if (url.hostname === 'ibb.co' && ibbDirectById[token]) return ibbDirectById[token]
+  if (url.hostname === 'i.ibb.co' && ibbDirectById[token]) return ibbDirectById[token]
+  return null
+}
+
 function normalizePreviewLogoUrl(raw: string): string {
   const value = raw.trim()
   if (!value) return ''
   try {
     const url = new URL(value)
+    const ibbResolved = resolveIbbDirectUrl(url)
+    if (ibbResolved) return ibbResolved
     if (url.hostname.endsWith('ibb.co')) {
       const hostPrefix = url.hostname.slice(0, -'ibb.co'.length)
       const onlyIDots = /^i*\.?i*\.?$/.test(hostPrefix)

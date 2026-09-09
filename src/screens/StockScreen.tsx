@@ -123,22 +123,20 @@ export function StockScreen() {
         )}
       </div>
 
-      {!catalogMode && (
-        <div className="no-scrollbar mt-3 flex gap-2 overflow-x-auto px-4 pb-1 lg:mt-4">
-          {['Todas', ...tipos].map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => setTipo(item)}
-              className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium ${
-                tipo === item ? 'bg-accent text-white' : 'glass text-muted'
-              }`}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-      )}
+      <div className={`no-scrollbar mt-3 flex gap-2 overflow-x-auto px-4 pb-1 ${catalogMode ? '' : 'lg:mt-4'}`}>
+        {['Todas', ...tipos].map((item) => (
+          <button
+            key={item}
+            type="button"
+            onClick={() => setTipo(item)}
+            className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium ${
+              tipo === item ? 'bg-accent text-white' : 'glass text-muted'
+            }`}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
 
       {(appFeatures.canCreateProducts || appFeatures.canImportProducts) && (
         <div className="mt-4 flex gap-2 px-4 lg:hidden">
