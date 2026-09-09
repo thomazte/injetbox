@@ -27,7 +27,8 @@ const ibbDirectById: Record<string, string> = {
   mCgGmCp1: 'https://i.ibb.co/HD3V0DZ1/rpd-logo-Photoroom.png',
 }
 const renataCatalogLogoUrl = ibbDirectById.mCgGmCp1
-const operationStockTitleLogoUrl = '/zamoht-exe-logo.png'
+const operationStockTitleLogoUrl = new URL('../zamoht-exe-logo.png', import.meta.url).toString()
+const fallbackStockTitleLogoUrl = new URL('../favicon.png', import.meta.url).toString()
 
 function resolveIbbDirectUrl(url: URL): string | null {
   const token = url.pathname.split('/').filter(Boolean)[0]
@@ -255,7 +256,7 @@ function StockTitleLogo({ src, alt }: { src: string; alt: string }) {
     setFailed(false)
   }, [src])
 
-  const safeSrc = failed || !src ? '/favicon.svg' : src
+  const safeSrc = failed || !src ? fallbackStockTitleLogoUrl : src
 
   return (
     <img
