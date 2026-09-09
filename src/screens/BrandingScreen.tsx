@@ -18,6 +18,7 @@ type HeaderPreview = {
 
 const ibbDirectById: Record<string, string> = {
   mCgGmCp1: 'https://i.ibb.co/HD3V0DZ1/rpd-logo-Photoroom.png',
+  '0jSdZzvn': 'https://i.ibb.co/JR4M2Sgc/IMG-20260909-WA0131.jpg',
 }
 
 function resolveIbbDirectUrl(url: URL): string | null {

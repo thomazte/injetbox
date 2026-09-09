@@ -25,6 +25,7 @@ const tabs: { id: Tab; label: string; icon: typeof Boxes }[] = [
 
 const ibbDirectById: Record<string, string> = {
   mCgGmCp1: 'https://i.ibb.co/HD3V0DZ1/rpd-logo-Photoroom.png',
+  '0jSdZzvn': 'https://i.ibb.co/JR4M2Sgc/IMG-20260909-WA0131.jpg',
 }
 const renataCatalogLogoUrl = ibbDirectById.mCgGmCp1
 const operationStockTitleLogoUrl = new URL('../zamoht-exe-logo.png', import.meta.url).toString()
@@ -136,7 +137,8 @@ function Shell() {
     shouldShowHeaderLogo && tab === 'visual' && visualHeaderPreview?.logoUrl
       ? normalizeLogoUrl(visualHeaderPreview.logoUrl)
       : defaultLogoUrl
-  const stockTitleLogoUrl = appMode === 'catalogo' ? renataCatalogLogoUrl : operationStockTitleLogoUrl
+  const stockTitleLogoUrl =
+    appMode === 'catalogo' ? headerLogoUrl || renataCatalogLogoUrl : operationStockTitleLogoUrl
 
   useEffect(() => {
     if (!visibleTabs.some((item) => item.id === tab)) {
