@@ -27,7 +27,7 @@ const ibbDirectById: Record<string, string> = {
   mCgGmCp1: 'https://i.ibb.co/HD3V0DZ1/rpd-logo-Photoroom.png',
 }
 const renataCatalogLogoUrl = ibbDirectById.mCgGmCp1
-const stockTitleLogoUrl = renataCatalogLogoUrl
+const operationStockTitleLogoUrl = '/zamoht-exe-logo.png'
 
 function resolveIbbDirectUrl(url: URL): string | null {
   const token = url.pathname.split('/').filter(Boolean)[0]
@@ -135,6 +135,7 @@ function Shell() {
     shouldShowHeaderLogo && tab === 'visual' && visualHeaderPreview?.logoUrl
       ? normalizeLogoUrl(visualHeaderPreview.logoUrl)
       : defaultLogoUrl
+  const stockTitleLogoUrl = appMode === 'catalogo' ? renataCatalogLogoUrl : operationStockTitleLogoUrl
 
   useEffect(() => {
     if (!visibleTabs.some((item) => item.id === tab)) {
