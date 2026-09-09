@@ -27,6 +27,7 @@ const ibbDirectById: Record<string, string> = {
   mCgGmCp1: 'https://i.ibb.co/HD3V0DZ1/rpd-logo-Photoroom.png',
 }
 const renataCatalogLogoUrl = ibbDirectById.mCgGmCp1
+const stockTitleLogoUrl = '/zamohtexe-logo.png'
 
 function resolveIbbDirectUrl(url: URL): string | null {
   const token = url.pathname.split('/').filter(Boolean)[0]
@@ -152,8 +153,10 @@ function Shell() {
   return (
     <div className="min-h-dvh lg:flex">
       <aside className="glass-strong hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col lg:border-r lg:border-white/10 lg:p-5">
-        <p className="text-xs font-semibold tracking-[0.14em] text-accent uppercase">{APP_NAME}</p>
-        <p className="mt-1 text-lg font-semibold tracking-tight">{APP_TAGLINE}</p>
+        <>
+          <p className="text-xs font-semibold tracking-[0.14em] text-accent uppercase">{APP_NAME}</p>
+          <p className="mt-1 text-lg font-semibold tracking-tight">{APP_TAGLINE}</p>
+        </>
         <p className="mt-2 inline-flex w-fit rounded-full bg-accent-soft px-2.5 py-1 text-[11px] font-semibold text-accent uppercase">
           {appModeLabel[appMode]}
         </p>
@@ -197,7 +200,7 @@ function Shell() {
           <div className="min-w-0">
             <p className="text-sm text-muted lg:hidden">{greeting()}</p>
             <div className="mt-0.5 flex items-center gap-2.5">
-              {shouldShowHeaderLogo && <BrandLogo src={headerLogoUrl} alt={headerName || APP_NAME} />}
+              {tab === 'estoque' && <StockTitleLogo src={stockTitleLogoUrl} alt={APP_NAME} />}
               <h1 className="truncate text-[28px] leading-tight font-semibold tracking-tight lg:text-[32px]">
                 {titles[tab] ?? 'InjetBox'}
               </h1>
@@ -270,6 +273,23 @@ function BrandLogo({ src, alt, size = 'md' }: { src: string; alt: string; size?:
       src={src}
       alt={alt}
       className={`shrink-0 border border-white/10 bg-transparent object-contain ${dimension}`}
+      loading="lazy"
+      decoding="async"
+      onError={() => setFailed(true)}
+    />
+  )
+}
+
+function StockTitleLogo({ src, alt }: { src: string; alt: string }) {
+  const [failed, setFailed] = useState(false)
+  if (!src || failed) {
+    return <BrandLogo src="/favicon.svg" alt={alt} />
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className="h-10 w-10 rounded-lg bg-transparent object-cover"
       loading="lazy"
       decoding="async"
       onError={() => setFailed(true)}
