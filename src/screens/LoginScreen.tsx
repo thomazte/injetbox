@@ -2,6 +2,7 @@ import type { FormEvent } from 'react'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { APP_NAME, APP_TAGLINE } from '../lib/brand'
+import { appMode } from '../lib/appMode'
 import { applyLoginThemeSnapshot } from '../lib/theme'
 import { CopyrightMark } from '../components/CopyrightMark'
 
@@ -14,10 +15,17 @@ export function LoginScreen() {
   const [confirm, setConfirm] = useState('')
   const [busy, setBusy] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+  const canCreateAccount = appMode !== 'catalogo'
 
   useEffect(() => {
     if (notice) setMode('entrar')
   }, [notice])
+
+  useEffect(() => {
+    if (!canCreateAccount && mode !== 'entrar') {
+      setMode('entrar')
+    }
+  }, [canCreateAccount, mode])
 
   useEffect(() => {
     // Antes de autenticar, tenta reaplicar o último visual salvo do tenant/admin.
@@ -28,6 +36,11 @@ export function LoginScreen() {
   async function onSubmit(event: FormEvent) {
     event.preventDefault()
     setFormError(null)
+
+    if (mode === 'criar' && !canCreateAccount) {
+      setFormError('Neste catálogo, use apenas o acesso fornecido pela empresa.')
+      return
+    }
 
     if (mode === 'criar') {
       if (name.trim().length < 2) {
@@ -55,39 +68,42 @@ export function LoginScreen() {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-5 py-10 lg:max-w-lg">
-      <div className="glass-strong rounded-3xl p-5 lg:p-8">
+    <main className={`mx-auto flex min-h-dvh max-w-md flex-col justify-center px-5 ${canCreateAccount ? 'py-10' : 'py-6'} lg:max-w-lg`}>
+      <div className={`glass-strong rounded-3xl ${canCreateAccount ? 'p-5 lg:p-8' : 'p-5 lg:p-7'}`}>
         <p className="text-sm font-medium tracking-wide text-accent uppercase">{APP_NAME}</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink">{APP_TAGLINE}</h1>
-        <p className="mt-3 text-muted">
-          Entre com o e-mail e a senha da oficina. Precisa de internet. Cada usuário vê só o próprio
-          estoque.
+        <p className={`${canCreateAccount ? 'mt-3' : 'mt-2'} text-muted`}>
+          {canCreateAccount
+            ? 'Entre com o e-mail e a senha da oficina. Precisa de internet. Cada usuário vê só o próprio estoque.'
+            : 'Acesso somente com credenciais fornecidas pela empresa.'}
         </p>
 
-        <div className="mt-8 grid grid-cols-2 rounded-xl glass p-1">
-          <button
-            type="button"
-            className={`rounded-lg py-2 text-sm font-medium ${mode === 'entrar' ? 'bg-surface text-ink' : 'text-muted'}`}
-            onClick={() => {
-              setMode('entrar')
-              setFormError(null)
-            }}
-          >
-            Entrar
-          </button>
-          <button
-            type="button"
-            className={`rounded-lg py-2 text-sm font-medium ${mode === 'criar' ? 'bg-surface text-ink' : 'text-muted'}`}
-            onClick={() => {
-              setMode('criar')
-              setFormError(null)
-            }}
-          >
-            Criar conta
-          </button>
-        </div>
+        {canCreateAccount && (
+          <div className="mt-8 grid grid-cols-2 rounded-xl glass p-1">
+            <button
+              type="button"
+              className={`rounded-lg py-2 text-sm font-medium ${mode === 'entrar' ? 'bg-surface text-ink' : 'text-muted'}`}
+              onClick={() => {
+                setMode('entrar')
+                setFormError(null)
+              }}
+            >
+              Entrar
+            </button>
+            <button
+              type="button"
+              className={`rounded-lg py-2 text-sm font-medium ${mode === 'criar' ? 'bg-surface text-ink' : 'text-muted'}`}
+              onClick={() => {
+                setMode('criar')
+                setFormError(null)
+              }}
+            >
+              Criar conta
+            </button>
+          </div>
+        )}
 
-        <form className="mt-6 flex flex-col gap-3" onSubmit={onSubmit}>
+        <form className={`${canCreateAccount ? 'mt-6 gap-3' : 'mt-4 gap-2.5'} flex flex-col`} onSubmit={onSubmit}>
           {mode === 'criar' && (
             <label className="text-sm font-medium text-ink">
               Seu nome

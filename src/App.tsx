@@ -23,11 +23,35 @@ const tabs: { id: Tab; label: string; icon: typeof Boxes }[] = [
   { id: 'visual', label: 'Visual', icon: Palette },
 ]
 
+const ibbDirectById: Record<string, string> = {
+  mCgGmCp1: 'https://i.ibb.co/HD3V0DZ1/rpd-logo-Photoroom.png',
+}
+const renataCatalogLogoUrl = ibbDirectById.mCgGmCp1
+
+function resolveIbbDirectUrl(url: URL): string | null {
+  const token = url.pathname.split('/').filter(Boolean)[0]
+  if (!token) return null
+  if (url.hostname === 'ibb.co' && ibbDirectById[token]) return ibbDirectById[token]
+  if (url.hostname === 'i.ibb.co' && ibbDirectById[token]) return ibbDirectById[token]
+  return null
+}
+
+function isRenataPecasDiesel(name: string | null | undefined): boolean {
+  const normalized = (name || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase()
+  return normalized.includes('renata pecas diesel')
+}
+
 function normalizeLogoUrl(raw: string | null | undefined): string {
   const value = raw?.trim() || ''
   if (!value) return ''
   try {
     const url = new URL(value)
+    const ibbResolved = resolveIbbDirectUrl(url)
+    if (ibbResolved) return ibbResolved
     if (url.hostname.endsWith('ibb.co')) {
       const hostPrefix = url.hostname.slice(0, -'ibb.co'.length)
       const onlyIDots = /^i*\.?i*\.?$/.test(hostPrefix)
@@ -101,7 +125,10 @@ function Shell() {
   }
   const displayName = companyName || name
   const shouldShowHeaderLogo = appMode === 'catalogo' || (tab === 'visual' && isPlatformAdmin)
-  const defaultLogoUrl = shouldShowHeaderLogo ? normalizeLogoUrl(tenantSettings?.logo_url) : ''
+  const defaultLogoUrl = shouldShowHeaderLogo
+    ? normalizeLogoUrl(tenantSettings?.logo_url) ||
+      (appMode === 'catalogo' && isRenataPecasDiesel(companyName) ? renataCatalogLogoUrl : '')
+    : ''
   const headerName = tab === 'visual' && visualHeaderPreview?.name ? visualHeaderPreview.name : displayName
   const headerLogoUrl =
     shouldShowHeaderLogo && tab === 'visual' && visualHeaderPreview?.logoUrl
@@ -113,6 +140,14 @@ function Shell() {
       setTab(visibleTabs[0]?.id ?? 'estoque')
     }
   }, [tab, visibleTabs])
+
+  useEffect(() => {
+    if (typeof document === 'undefined' || appMode !== 'catalogo' || !headerLogoUrl) return
+    const favicon = document.querySelector<HTMLLinkElement>("link[rel='icon']")
+    const appleTouch = document.querySelector<HTMLLinkElement>("link[rel='apple-touch-icon']")
+    if (favicon) favicon.href = headerLogoUrl
+    if (appleTouch) appleTouch.href = headerLogoUrl
+  }, [headerLogoUrl])
 
   return (
     <div className="min-h-dvh lg:flex">
