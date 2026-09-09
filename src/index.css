@@ -3,28 +3,28 @@
 @theme {
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
-  --color-paper: #0a0a0a;
-  --color-ink: #ffffff;
-  --color-muted: #c4c4c4;
+  --color-paper: #0B1220;
+  --color-ink: #F9FAFB;
+  --color-muted: #9CA3AF;
   --color-line: rgba(255, 255, 255, 0.16);
   --color-surface: rgba(255, 255, 255, 0.06);
-  --color-accent: #ff6a00;
-  --color-accent-soft: rgba(255, 106, 0, 0.18);
-  --color-warn: #ff6a00;
-  --color-warn-soft: rgba(255, 106, 0, 0.18);
-  --color-danger: #ff6a00;
-  --color-danger-soft: rgba(255, 106, 0, 0.18);
-  --color-ok: #ff6a00;
-  --color-ok-soft: rgba(255, 106, 0, 0.18);
-  --app-bg: #0a0a0a;
-  --app-bg-alt: #070707;
-  --app-surface: #161616;
-  --status-ok-bg: rgba(255, 106, 0, 0.18);
-  --status-ok-text: #ff6a00;
-  --status-low-bg: #ff6a00;
-  --status-low-text: #ffffff;
-  --status-zero-bg: #101010;
-  --status-zero-text: #ffffff;
+  --color-accent: #2563EB;
+  --color-accent-soft: rgba(37, 99, 235, 0.18);
+  --color-warn: #2563EB;
+  --color-warn-soft: rgba(37, 99, 235, 0.18);
+  --color-danger: #2563EB;
+  --color-danger-soft: rgba(37, 99, 235, 0.18);
+  --color-ok: #DBEAFE;
+  --color-ok-soft: #1E3A8A;
+  --app-bg: #0B1220;
+  --app-bg-alt: #111827;
+  --app-surface: #1F2937;
+  --status-ok-bg: #1E3A8A;
+  --status-ok-text: #DBEAFE;
+  --status-low-bg: #2563EB;
+  --status-low-text: #000000;
+  --status-zero-bg: #FFFFFF;
+  --status-zero-text: #000000;
 }
 
 html,
@@ -99,7 +99,7 @@ textarea::placeholder {
 input:focus,
 select:focus,
 textarea:focus {
-  outline: 2px solid rgba(255, 106, 0, 0.7);
+  outline: 2px solid rgba(37, 99, 235, 0.7);
   outline-offset: 1px;
 }
 

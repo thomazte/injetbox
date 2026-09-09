@@ -181,11 +181,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       notice,
       async saveTenantSettings(input, targetTenantId) {
         setError(null)
-        if (!isAdmin && !isPlatformAdmin) {
-          throw new Error('Somente administrador pode alterar o visual da empresa.')
+        if (!isPlatformAdmin) {
+          throw new Error('Somente a conta da plataforma pode alterar o visual do catálogo.')
         }
         const fallbackTenant = tenantId || user?.id || null
-        const effectiveTenant = isPlatformAdmin && targetTenantId ? targetTenantId : fallbackTenant
+        const effectiveTenant = targetTenantId || fallbackTenant
         if (!effectiveTenant) {
           throw new Error('Tenant não encontrado para salvar o tema.')
         }

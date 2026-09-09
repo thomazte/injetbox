@@ -53,18 +53,18 @@ export function BrandingScreen({
   const [selectedTenantName, setSelectedTenantName] = useState('')
   const [company, setCompany] = useState('')
   const [logoUrl, setLogoUrl] = useState('')
-  const [primary, setPrimary] = useState('#ff6a00')
-  const [background, setBackground] = useState('#0a0a0a')
-  const [backgroundAlt, setBackgroundAlt] = useState('#070707')
-  const [surface, setSurface] = useState('#161616')
-  const [text, setText] = useState('#ffffff')
-  const [muted, setMuted] = useState('#c4c4c4')
-  const [stockOk, setStockOk] = useState('#2f9e44')
-  const [stockOkText, setStockOkText] = useState('#ffffff')
-  const [stockLow, setStockLow] = useState('#f08c00')
-  const [stockLowText, setStockLowText] = useState('#ffffff')
-  const [stockZero, setStockZero] = useState('#c92a2a')
-  const [stockZeroText, setStockZeroText] = useState('#ffffff')
+  const [primary, setPrimary] = useState('#2563EB')
+  const [background, setBackground] = useState('#0B1220')
+  const [backgroundAlt, setBackgroundAlt] = useState('#111827')
+  const [surface, setSurface] = useState('#1F2937')
+  const [text, setText] = useState('#F9FAFB')
+  const [muted, setMuted] = useState('#9CA3AF')
+  const [stockOk, setStockOk] = useState('#1E3A8A')
+  const [stockOkText, setStockOkText] = useState('#DBEAFE')
+  const [stockLow, setStockLow] = useState('#2563EB')
+  const [stockLowText, setStockLowText] = useState('#000000')
+  const [stockZero, setStockZero] = useState('#FFFFFF')
+  const [stockZeroText, setStockZeroText] = useState('#000000')
   const [busy, setBusy] = useState(false)
   const [loadingTenant, setLoadingTenant] = useState(false)
   const [hasTenantTheme, setHasTenantTheme] = useState(true)
@@ -90,18 +90,18 @@ export function BrandingScreen({
   function applyFormValues(settings: TenantSettings | null, fallbackName: string) {
     setCompany(settings?.company_name || fallbackName || '')
     setLogoUrl(settings?.logo_url || '')
-    setPrimary(settings?.primary_color || '#ff6a00')
-    setBackground(settings?.background_color || '#0a0a0a')
-    setBackgroundAlt(settings?.background_alt_color || '#070707')
-    setSurface(settings?.surface_color || '#161616')
-    setText(settings?.text_color || '#ffffff')
-    setMuted(settings?.muted_color || '#c4c4c4')
-    setStockOk(settings?.stock_ok_color || '#2f9e44')
-    setStockOkText(settings?.stock_ok_text_color || '#ffffff')
-    setStockLow(settings?.stock_low_color || '#f08c00')
-    setStockLowText(settings?.stock_low_text_color || '#ffffff')
-    setStockZero(settings?.stock_zero_color || '#c92a2a')
-    setStockZeroText(settings?.stock_zero_text_color || '#ffffff')
+    setPrimary(settings?.primary_color || '#2563EB')
+    setBackground(settings?.background_color || '#0B1220')
+    setBackgroundAlt(settings?.background_alt_color || '#111827')
+    setSurface(settings?.surface_color || '#1F2937')
+    setText(settings?.text_color || '#F9FAFB')
+    setMuted(settings?.muted_color || '#9CA3AF')
+    setStockOk(settings?.stock_ok_color || '#1E3A8A')
+    setStockOkText(settings?.stock_ok_text_color || '#DBEAFE')
+    setStockLow(settings?.stock_low_color || '#2563EB')
+    setStockLowText(settings?.stock_low_text_color || '#000000')
+    setStockZero(settings?.stock_zero_color || '#FFFFFF')
+    setStockZeroText(settings?.stock_zero_text_color || '#000000')
     setHasTenantTheme(Boolean(settings))
     setThemeUpdatedAt(settings?.updated_at || null)
   }
@@ -386,6 +386,16 @@ export function BrandingScreen({
         <Field label="Nome da empresa">
           <input value={company} onChange={(event) => setCompany(event.target.value)} placeholder="Renata Peças Diesel" />
         </Field>
+        <Field label="Ícone do catálogo (URL da logo)">
+          <input
+            value={logoUrl}
+            onChange={(event) => setLogoUrl(event.target.value)}
+            placeholder="https://exemplo.com/logo.png"
+          />
+        </Field>
+        <p className="-mt-2 text-[11px] text-muted">
+          Este ícone aparece somente no catálogo público.
+        </p>
 
         <div className="grid gap-3 md:grid-cols-2">
           <Field label="Cor principal">

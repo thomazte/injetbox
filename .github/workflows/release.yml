@@ -9,7 +9,28 @@ permissions:
   contents: write
 
 jobs:
+  guard-tag-on-main:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Ensure tag points to main HEAD
+        shell: bash
+        run: |
+          git fetch origin main --depth=1
+          TAG_SHA="$(git rev-list -n 1 "$GITHUB_REF")"
+          MAIN_SHA="$(git rev-parse origin/main)"
+          if [ "$TAG_SHA" != "$MAIN_SHA" ]; then
+            echo "Tag $GITHUB_REF_NAME não está no HEAD da main."
+            echo "TAG_SHA=$TAG_SHA"
+            echo "MAIN_SHA=$MAIN_SHA"
+            echo "Crie a tag após o push final na main para evitar release com versão antiga."
+            exit 1
+          fi
+
   android:
+    needs: guard-tag-on-main
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -45,6 +66,7 @@ jobs:
           path: android/app/build/outputs/apk/debug/InjetBox-${{ matrix.mode }}.apk
 
   desktop:
+    needs: guard-tag-on-main
     runs-on: windows-latest
     strategy:
       fail-fast: false
