@@ -7,10 +7,16 @@ import type { MovementType, Product } from '../types'
 import { Field } from './Field'
 import { SuggestField } from './SuggestField'
 
-function productLabel(product: Product) {
+function productLabel(product: Pick<Product, 'code' | 'brand' | 'tipo'>) {
   const title = productTitle(product)
-  if (product.brand && title !== product.brand) return `${title} · ${product.brand}`
-  return title
+  const parts = [title]
+  if (product.brand && title !== product.brand) parts.push(product.brand)
+  if (product.tipo) parts.push(product.tipo)
+  return parts.join(' · ')
+}
+
+function productMeta(product: Pick<Product, 'tipo' | 'category'>) {
+  return [product.tipo, product.category].filter(Boolean).join(' · ')
 }
 
 export function QuickMoveSheet({ onClose }: { onClose: () => void }) {
@@ -119,7 +125,7 @@ export function QuickMoveSheet({ onClose }: { onClose: () => void }) {
         },
         selected.id,
       )
-      setQuery(productLabel({ ...selected, brand, code: code.trim() || null }))
+      setQuery(productLabel({ ...selected, brand, code: code.trim() || null, tipo }))
       setEditing(false)
       setNotice('Cadastro atualizado.')
     } catch (err) {
@@ -183,11 +189,11 @@ export function QuickMoveSheet({ onClose }: { onClose: () => void }) {
                 onBlur={() => {
                   window.setTimeout(() => setOpenList(false), 120)
                 }}
-                placeholder="Código ou marca"
+                placeholder="Código, marca ou tipo"
                 autoComplete="off"
               />
               {openList && (
-                <ul className="glass-strong absolute z-20 mt-1 max-h-52 w-full overflow-y-auto rounded-xl">
+                <ul className="glass-strong absolute z-20 mt-1 max-h-64 w-full overflow-y-auto rounded-xl">
                   {matches.length === 0 ? (
                     <li className="px-3 py-2.5 text-sm text-muted">Nenhuma peça encontrada.</li>
                   ) : (
@@ -199,7 +205,17 @@ export function QuickMoveSheet({ onClose }: { onClose: () => void }) {
                           onMouseDown={(event) => event.preventDefault()}
                           onClick={() => pickProduct(item)}
                         >
-                          <span className="min-w-0 truncate">{productLabel(item)}</span>
+                          <span className="min-w-0">
+                            {productMeta(item) && (
+                              <span className="block truncate text-[11px] font-semibold tracking-[0.08em] text-muted uppercase">
+                                {productMeta(item)}
+                              </span>
+                            )}
+                            <span className="block truncate">{productTitle(item)}</span>
+                            {item.brand && item.code ? (
+                              <span className="block truncate text-xs text-muted">{item.brand}</span>
+                            ) : null}
+                          </span>
                           <span className="shrink-0 font-mono text-muted">
                             {formatQty(item.quantity, item.unit)}
                           </span>
@@ -214,6 +230,12 @@ export function QuickMoveSheet({ onClose }: { onClose: () => void }) {
 
           {selected && (
             <p className="rounded-xl bg-white/5 px-3 py-2 text-sm text-muted">
+              {productMeta(selected) && (
+                <>
+                  <span className="font-semibold text-ink">{productMeta(selected)}</span>
+                  <span className="mx-1.5">·</span>
+                </>
+              )}
               Estoque atual:{' '}
               <span className="font-mono text-ink">{formatQty(selected.quantity, selected.unit)}</span>
             </p>
