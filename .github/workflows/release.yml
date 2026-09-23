@@ -42,11 +42,16 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
-      - uses: android-actions/setup-android@v3
+      - name: Use runner Android SDK
+        run: |
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
+          test -d "$SDK"
       - run: npm ci
       - run: node scripts/set-release-version.mjs
       - run: npm run build
@@ -107,11 +112,17 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - name: Install Linux packagers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fakeroot dpkg
+          sudo apt-get install -y --no-install-recommends libfuse2 || sudo apt-get install -y --no-install-recommends libfuse2t64
       - run: npm ci
       - run: node scripts/set-release-version.mjs
       - run: npm run desktop:build:linux
         env:
           VITE_APP_MODE: ${{ matrix.mode }}
+          USE_HARD_LINKS: false
       - uses: actions/upload-artifact@v4
         with:
           name: injetbox-linux-${{ matrix.mode }}
