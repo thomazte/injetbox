@@ -27,6 +27,7 @@ dist-ssr
 *.sln
 *.sw?
 release
+release-linux
 android/.gradle
 android/build
 android/app/build

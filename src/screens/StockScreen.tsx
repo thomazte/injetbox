@@ -1,24 +1,27 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Plus, Search, Upload } from 'lucide-react'
+import { ArrowDownUp, Plus, Search, Upload } from 'lucide-react'
 import { useInventory } from '../context/InventoryContext'
-import { MovementSheet } from '../components/MovementSheet'
 import { ProductCard } from '../components/ProductCard'
 import { ProductForm } from '../components/ProductForm'
+import { QuickMoveSheet } from '../components/QuickMoveSheet'
 import { appFeatures, appMode } from '../lib/appMode'
 import { ImportScreen } from './ImportScreen'
-import type { Product } from '../types'
 
 export function StockScreen() {
   const { products, lowStock, tipos, loading } = useInventory()
   const catalogMode = appMode === 'catalogo'
-  const canOpenDetails = appFeatures.canMoveStock || appFeatures.canEditProducts || appFeatures.canDeleteProducts
   const [showInstallHint, setShowInstallHint] = useState(false)
   const [isIos, setIsIos] = useState(false)
   const [query, setQuery] = useState('')
   const [tipo, setTipo] = useState('Todas')
-  const [selected, setSelected] = useState<Product | null>(null)
   const [creating, setCreating] = useState(false)
   const [importing, setImporting] = useState(false)
+  const [quickMoving, setQuickMoving] = useState(false)
+  const showActions =
+    appFeatures.canCreateProducts ||
+    appFeatures.canImportProducts ||
+    appFeatures.canMoveStock ||
+    appFeatures.canEditProducts
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase()
@@ -97,28 +100,14 @@ export function StockScreen() {
             placeholder="Código, marca, tipo ou categoria"
           />
         </div>
-        {(appFeatures.canCreateProducts || appFeatures.canImportProducts) && (
+        {showActions && (
           <div className="hidden gap-2 lg:flex lg:shrink-0">
-            {appFeatures.canCreateProducts && (
-              <button
-                type="button"
-                onClick={() => setCreating(true)}
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-accent py-3 text-sm font-semibold text-white lg:flex-none lg:px-5"
-              >
-                <Plus size={16} />
-                Novo
-              </button>
-            )}
-            {appFeatures.canImportProducts && (
-              <button
-                type="button"
-                onClick={() => setImporting(true)}
-                className="glass flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-ink lg:flex-none lg:px-5"
-              >
-                <Upload size={16} />
-                Planilha
-              </button>
-            )}
+            <StockActions
+              compact
+              onCreate={() => setCreating(true)}
+              onQuickMove={() => setQuickMoving(true)}
+              onImport={() => setImporting(true)}
+            />
           </div>
         )}
       </div>
@@ -138,28 +127,13 @@ export function StockScreen() {
         ))}
       </div>
 
-      {(appFeatures.canCreateProducts || appFeatures.canImportProducts) && (
+      {showActions && (
         <div className="mt-4 flex gap-2 px-4 lg:hidden">
-          {appFeatures.canCreateProducts && (
-            <button
-              type="button"
-              onClick={() => setCreating(true)}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-accent py-3 text-sm font-semibold text-white"
-            >
-              <Plus size={16} />
-              Novo
-            </button>
-          )}
-          {appFeatures.canImportProducts && (
-            <button
-              type="button"
-              onClick={() => setImporting(true)}
-              className="glass flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-ink"
-            >
-              <Upload size={16} />
-              Planilha
-            </button>
-          )}
+          <StockActions
+            onCreate={() => setCreating(true)}
+            onQuickMove={() => setQuickMoving(true)}
+            onImport={() => setImporting(true)}
+          />
         </div>
       )}
 
@@ -178,25 +152,66 @@ export function StockScreen() {
         <ul className="mt-4 grid grid-cols-1 gap-2.5 px-4 lg:grid-cols-2 xl:grid-cols-3">
           {filtered.map((product) => (
             <li key={product.id}>
-              <ProductCard
-                product={product}
-                catalogView={catalogMode}
-                onOpen={canOpenDetails ? () => setSelected(product) : undefined}
-              />
+              <ProductCard product={product} catalogView={catalogMode} />
             </li>
           ))}
         </ul>
       )}
 
-      {canOpenDetails && selected && (
-        <MovementSheet
-          product={products.find((item) => item.id === selected.id) ?? selected}
-          onClose={() => setSelected(null)}
-        />
-      )}
       {appFeatures.canCreateProducts && creating && <ProductForm onClose={() => setCreating(false)} />}
       {appFeatures.canImportProducts && importing && <ImportScreen onClose={() => setImporting(false)} />}
+      {(appFeatures.canMoveStock || appFeatures.canEditProducts) && quickMoving && (
+        <QuickMoveSheet onClose={() => setQuickMoving(false)} />
+      )}
     </div>
+  )
+}
+
+function StockActions({
+  compact = false,
+  onCreate,
+  onQuickMove,
+  onImport,
+}: {
+  compact?: boolean
+  onCreate: () => void
+  onQuickMove: () => void
+  onImport: () => void
+}) {
+  const stretch = compact ? 'lg:flex-none lg:px-5' : ''
+  return (
+    <>
+      {appFeatures.canCreateProducts && (
+        <button
+          type="button"
+          onClick={onCreate}
+          className={`flex flex-1 items-center justify-center gap-2 rounded-xl bg-accent py-3 text-sm font-semibold text-white ${stretch}`}
+        >
+          <Plus size={16} />
+          Novo
+        </button>
+      )}
+      {(appFeatures.canMoveStock || appFeatures.canEditProducts) && (
+        <button
+          type="button"
+          onClick={onQuickMove}
+          className={`glass flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-ink ${stretch}`}
+        >
+          <ArrowDownUp size={16} />
+          Entrada/Saída
+        </button>
+      )}
+      {appFeatures.canImportProducts && (
+        <button
+          type="button"
+          onClick={onImport}
+          className={`glass flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-ink ${stretch}`}
+        >
+          <Upload size={16} />
+          Planilha
+        </button>
+      )}
+    </>
   )
 }
 

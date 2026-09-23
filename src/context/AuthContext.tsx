@@ -10,6 +10,7 @@ import type { Session } from '@supabase/supabase-js'
 import { authCaught, authMessage } from '../lib/authErrors'
 import {
   clearLocalSession,
+  localChangePassword,
   localSignIn,
   localSignUp,
   readLocalSession,
@@ -41,6 +42,7 @@ type AuthContextValue = {
   ) => Promise<void>
   signIn: (email: string, password: string) => Promise<void>
   signUp: (name: string, email: string, password: string) => Promise<void>
+  changePassword: (currentPassword: string, nextPassword: string) => Promise<void>
   signOut: () => Promise<void>
 }
 
@@ -341,6 +343,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setNotice('Conta criada. Entre com seu e-mail e senha.')
         } catch (err) {
           setError(authCaught(err))
+        }
+      },
+      async changePassword(currentPassword, nextPassword) {
+        const current = currentPassword.trim()
+        const next = nextPassword.trim()
+        if (current.length < 6 || next.length < 6) {
+          throw new Error('A senha precisa ter pelo menos 6 caracteres.')
+        }
+        if (current === next) {
+          throw new Error('A nova senha precisa ser diferente.')
+        }
+        if (!user) {
+          throw new Error('Entre de novo para alterar a senha.')
+        }
+
+        if (!isConfigured) {
+          await localChangePassword(user.id, current, next)
+          return
+        }
+
+        const email = user.email?.trim().toLowerCase()
+        if (!email) {
+          throw new Error('Sessão sem e-mail. Entre de novo para alterar a senha.')
+        }
+
+        const client = getSupabase()
+        const { error: verifyError } = await client.auth.signInWithPassword({
+          email,
+          password: current,
+        })
+        if (verifyError) {
+          const message = authMessage(verifyError.message)
+          throw new Error(message === 'E-mail ou senha incorretos.' ? 'Senha atual incorreta.' : message)
+        }
+
+        const { error: updateError } = await client.auth.updateUser({ password: next })
+        if (updateError) {
+          throw new Error(authMessage(updateError.message))
         }
       },
       async signOut() {

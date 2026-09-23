@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { Bell, Boxes, Clock3, LogOut, Palette } from 'lucide-react'
+import { Bell, Boxes, Clock3, KeyRound, LogOut, Palette } from 'lucide-react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { InventoryProvider, useInventory } from './context/InventoryContext'
 import { appFeatures, appMode, appModeLabel } from './lib/appMode'
@@ -12,6 +12,7 @@ import { StockScreen } from './screens/StockScreen'
 import { AlertsScreen } from './screens/AlertsScreen'
 import { HistoryScreen } from './screens/HistoryScreen'
 import { BrandingScreen } from './screens/BrandingScreen'
+import { PasswordSheet } from './components/PasswordSheet'
 
 type Tab = 'estoque' | 'alertas' | 'historico' | 'visual'
 type HeaderPreview = { name: string; logoUrl: string }
@@ -109,6 +110,7 @@ function Shell() {
   const { signOut, name, companyName, tenantSettings, isPlatformAdmin } = useAuth()
   const { lowStock, error } = useInventory()
   const [visualHeaderPreview, setVisualHeaderPreview] = useState<HeaderPreview | null>(null)
+  const [changingPassword, setChangingPassword] = useState(false)
   const visibleTabs = useMemo(
     () =>
       tabs.filter((item) => {
@@ -186,6 +188,16 @@ function Shell() {
           {!isConfigured && (
             <p className="text-xs text-muted">Estoque só neste aparelho, na sua conta.</p>
           )}
+          {appFeatures.canChangePassword && (
+            <button
+              type="button"
+              onClick={() => setChangingPassword(true)}
+              className="glass flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted"
+            >
+              <KeyRound size={16} />
+              Alterar senha
+            </button>
+          )}
           <button
             type="button"
             onClick={() => void signOut()}
@@ -210,14 +222,26 @@ function Shell() {
             </div>
             <CopyrightMark className="mt-1 lg:hidden" />
           </div>
-          <button
-            type="button"
-            onClick={() => void signOut()}
-            className="glass rounded-full p-2 text-muted lg:hidden"
-            aria-label="Sair"
-          >
-            <LogOut size={18} />
-          </button>
+          <div className="flex items-center gap-2 lg:hidden">
+            {appFeatures.canChangePassword && (
+              <button
+                type="button"
+                onClick={() => setChangingPassword(true)}
+                className="glass rounded-full p-2 text-muted"
+                aria-label="Alterar senha"
+              >
+                <KeyRound size={18} />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => void signOut()}
+              className="glass rounded-full p-2 text-muted"
+              aria-label="Sair"
+            >
+              <LogOut size={18} />
+            </button>
+          </div>
         </header>
 
         {error && (
@@ -233,6 +257,8 @@ function Shell() {
           {tab === 'visual' && <BrandingScreen onHeaderPreviewChange={setVisualHeaderPreview} />}
         </main>
       </div>
+
+      {changingPassword && <PasswordSheet onClose={() => setChangingPassword(false)} />}
 
       <nav className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-lg px-3 pb-[max(10px,env(safe-area-inset-bottom))] lg:hidden">
         <div className="glass glass-nav flex gap-1 rounded-3xl p-1">

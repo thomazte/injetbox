@@ -87,6 +87,8 @@ Scripts úteis:
 - `npm run lint`
 - `npm run desktop`
 - `npm run desktop:build`
+- `npm run desktop:build:linux`
+- `npm run desktop:build:linux:all`
 - `npm run android:apk`
 
 ## Build, release e distribuição

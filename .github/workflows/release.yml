@@ -94,8 +94,33 @@ jobs:
           name: injetbox-windows-${{ matrix.mode }}
           path: release/*-${{ matrix.mode }}.exe
 
+  linux:
+    needs: guard-tag-on-main
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [demo, operacao, catalogo]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node scripts/set-release-version.mjs
+      - run: npm run desktop:build:linux
+        env:
+          VITE_APP_MODE: ${{ matrix.mode }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: injetbox-linux-${{ matrix.mode }}
+          path: |
+            release/*.AppImage
+            release/*.deb
+
   publish:
-    needs: [android, desktop]
+    needs: [android, desktop, linux]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -106,6 +131,7 @@ jobs:
           files: |
             injetbox-android-*/InjetBox-*.apk
             injetbox-windows-*/*.exe
+            injetbox-linux-*/*
           generate_release_notes: true
           name: InjetBox ${{ github.ref_name }}
           fail_on_unmatched_files: true
@@ -116,6 +142,7 @@ jobs:
           files: |
             injetbox-android-*/InjetBox-*.apk
             injetbox-windows-*/*.exe
+            injetbox-linux-*/*
           generate_release_notes: true
           name: InjetBox ${{ github.ref_name }}
           fail_on_unmatched_files: true

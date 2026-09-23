@@ -107,3 +107,16 @@ export async function localSignIn(email: string, password: string) {
   writeSession(account.id)
   return { id: account.id, email: account.email, name: account.name }
 }
+
+export async function localChangePassword(userId: string, currentPassword: string, nextPassword: string) {
+  const accounts = readAccounts()
+  const account = accounts.find((item) => item.id === userId)
+  if (!account) throw new Error('Conta não encontrada. Entre de novo.')
+  const currentHash = await hashPassword(currentPassword, account.id)
+  if (currentHash !== account.passwordHash) throw new Error('Senha atual incorreta.')
+  const nextHash = await hashPassword(nextPassword, account.id)
+  if (nextHash === account.passwordHash) throw new Error('A nova senha precisa ser diferente.')
+  writeAccounts(
+    accounts.map((item) => (item.id === userId ? { ...item, passwordHash: nextHash } : item)),
+  )
+}

@@ -17,6 +17,7 @@ Abra: `http://localhost:5173/`
 - Web (dev): `npm run dev`
 - Build: `npm run build`
 - Desktop (Windows): `npm run desktop` / `npm run desktop:build`
+- Desktop (Linux): `npm run desktop:build:linux` (modo atual) / `npm run desktop:build:linux:all` (demo, operação e catálogo)
 - Android (APK): `npm run android:apk`
 
 ## Modos de execução
