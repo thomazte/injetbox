@@ -101,7 +101,7 @@ jobs:
 
   linux:
     needs: guard-tag-on-main
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -115,14 +115,26 @@ jobs:
       - name: Install Linux packagers
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends fakeroot dpkg
-          sudo apt-get install -y --no-install-recommends libfuse2 || sudo apt-get install -y --no-install-recommends libfuse2t64
+          sudo apt-get install -y --no-install-recommends fakeroot dpkg libfuse2 fuse
       - run: npm ci
       - run: node scripts/set-release-version.mjs
-      - run: npm run desktop:build:linux
+      - name: Build web app
+        run: npx vite build --base ./
+        env:
+          VITE_APP_MODE: ${{ matrix.mode }}
+      - name: Package Linux AppImage and deb
+        run: npx electron-builder --linux AppImage deb --publish never
         env:
           VITE_APP_MODE: ${{ matrix.mode }}
           USE_HARD_LINKS: false
+          APPIMAGE_EXTRACT_AND_RUN: 1
+      - name: Stamp Linux artifacts
+        run: node scripts/stamp-linux-build.mjs
+        env:
+          VITE_APP_MODE: ${{ matrix.mode }}
+      - name: Debug Linux artifacts
+        if: failure()
+        run: ls -la release || true
       - uses: actions/upload-artifact@v4
         with:
           name: injetbox-linux-${{ matrix.mode }}

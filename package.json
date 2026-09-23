@@ -16,7 +16,7 @@
     "desktop": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "release:prepare-version": "node scripts/set-release-version.mjs",
     "desktop:build": "npm run release:prepare-version && vite build --base ./ && electron-builder --win portable && node scripts/copy-desktop-build.mjs",
-    "desktop:build:linux": "npm run release:prepare-version && vite build --base ./ && electron-builder --linux AppImage deb && node scripts/stamp-linux-build.mjs && node scripts/copy-desktop-build.mjs",
+    "desktop:build:linux": "npm run release:prepare-version && vite build --base ./ && electron-builder --linux AppImage deb --publish never && node scripts/stamp-linux-build.mjs && node scripts/copy-desktop-build.mjs",
     "desktop:build:linux:all": "node scripts/build-linux-all.mjs",
     "android:sync": "npm run release:prepare-version && npm run build && npx cap sync android",
     "android:open": "npx cap open android",
