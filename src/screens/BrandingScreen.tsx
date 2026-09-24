@@ -62,7 +62,7 @@ export function BrandingScreen({
   onHeaderPreviewChange?: (preview: HeaderPreview | null) => void
 }) {
   const { tenantSettings, companyName, isPlatformAdmin, saveTenantSettings } = useAuth()
-  const [mode, setMode] = useState<'demo' | 'empresa'>('demo')
+  const [mode, setMode] = useState<'conta' | 'empresa'>('conta')
   const [tenants, setTenants] = useState<TenantOption[]>([])
   const [selectedTenantId, setSelectedTenantId] = useState('')
   const [selectedTenantName, setSelectedTenantName] = useState('')
@@ -141,7 +141,7 @@ export function BrandingScreen({
   }, [selectedTenantId, tenants])
 
   useEffect(() => {
-    if (mode !== 'demo') return
+    if (mode !== 'conta') return
     applyFormValues(tenantSettings, companyName)
     applyTenantTheme(tenantSettings)
   }, [mode, tenantSettings, companyName])
@@ -341,12 +341,12 @@ export function BrandingScreen({
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={() => setMode('demo')}
+                onClick={() => setMode('conta')}
                 className={`rounded-xl py-3 text-sm font-semibold ${
-                  mode === 'demo' ? 'bg-accent text-white' : 'glass text-muted'
+                  mode === 'conta' ? 'bg-accent text-white' : 'glass text-muted'
                 }`}
               >
-                Demonstração
+                Conta atual
               </button>
               <button
                 type="button"

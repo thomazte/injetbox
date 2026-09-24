@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Bell, Boxes, Clock3, KeyRound, LogOut, Palette } from 'lucide-react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { InventoryProvider, useInventory } from './context/InventoryContext'
-import { appFeatures, appMode, appModeLabel } from './lib/appMode'
+import { appFeatures, appMode, appModeLabel, catalogPresetCompanyName, catalogPresetLogoUrl } from './lib/appMode'
 import { isConfigured } from './lib/supabase'
 import { APP_NAME, APP_TAGLINE } from './lib/brand'
 import { greeting } from './lib/format'
@@ -107,7 +107,7 @@ function Gate() {
 }
 
 function Shell() {
-  const { signOut, name, companyName, tenantSettings, isPlatformAdmin } = useAuth()
+  const { signOut, name, companyName, tenantSettings, isPlatformAdmin, canManageCatalogBranding } = useAuth()
   const { lowStock, error } = useInventory()
   const [visualHeaderPreview, setVisualHeaderPreview] = useState<HeaderPreview | null>(null)
   const [changingPassword, setChangingPassword] = useState(false)
@@ -116,10 +116,10 @@ function Shell() {
       tabs.filter((item) => {
         if (item.id === 'alertas') return appFeatures.canSeeAlerts
         if (item.id === 'historico') return appFeatures.canSeeHistory
-        if (item.id === 'visual') return appFeatures.canManageBranding && isPlatformAdmin
+        if (item.id === 'visual') return appFeatures.canManageBranding && canManageCatalogBranding
         return true
       }),
-    [isPlatformAdmin],
+    [canManageCatalogBranding],
   )
   const [tab, setTab] = useState<Tab>(visibleTabs[0]?.id ?? 'estoque')
   const titles: Record<Tab, string> = {
@@ -128,10 +128,11 @@ function Shell() {
     historico: 'Histórico',
     visual: 'Visual',
   }
-  const displayName = companyName || name
+  const displayName = companyName || (appMode === 'catalogo' ? catalogPresetCompanyName : '') || name
   const shouldShowHeaderLogo = appMode === 'catalogo' || (tab === 'visual' && isPlatformAdmin)
   const defaultLogoUrl = shouldShowHeaderLogo
     ? normalizeLogoUrl(tenantSettings?.logo_url) ||
+      (appMode === 'catalogo' ? normalizeLogoUrl(catalogPresetLogoUrl) : '') ||
       (appMode === 'catalogo' && isRenataPecasDiesel(companyName) ? renataCatalogLogoUrl : '')
     : ''
   const headerName = tab === 'visual' && visualHeaderPreview?.name ? visualHeaderPreview.name : displayName

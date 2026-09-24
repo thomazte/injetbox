@@ -35,7 +35,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode: [demo, operacao, catalogo]
+        mode: [operacao, catalogo]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -76,7 +76,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode: [demo, operacao, catalogo]
+        mode: [operacao, catalogo]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -105,7 +105,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode: [demo, operacao, catalogo]
+        mode: [operacao, catalogo]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

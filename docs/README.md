@@ -21,7 +21,7 @@ O InjetBox é um sistema de controle de estoque com:
 - entrada e saída de estoque com histórico;
 - alertas de baixo estoque;
 - visual por empresa (nome, logo e cores);
-- operação em 3 modos de produto no mesmo código.
+- operação em 2 modos de produto no mesmo código.
 
 ## Arquitetura e stack
 
@@ -44,14 +44,12 @@ docs/       documentação detalhada
 
 Controlados por `VITE_APP_MODE`:
 
-- `demo`: demonstração comercial;
 - `operacao`: gestão completa;
 - `catalogo`: consulta (sem operações de estoque).
 
 Exemplos (PowerShell):
 
 ```powershell
-$env:VITE_APP_MODE="demo"; npm run dev
 $env:VITE_APP_MODE="operacao"; npm run dev
 $env:VITE_APP_MODE="catalogo"; npm run dev
 ```
@@ -90,12 +88,18 @@ Scripts úteis:
 - `npm run desktop:build:linux`
 - `npm run desktop:build:linux:all`
 - `npm run android:apk`
+- `npm run catalogo:cliente -- --name "Cliente" --logo "https://..."` (gera catálogo web por cliente)
 
 ## Build, release e distribuição
 
 - CI padrão: `lint + build` a cada push/PR na `main`.
-- Release: workflow de matriz para `demo`, `operacao` e `catalogo` (Android + Desktop).
+- Release: workflow de matriz para `operacao` e `catalogo` (Android + Desktop).
 - Versionamento por tag: `vX.Y.Z`.
+
+Regras atuais de acesso:
+
+- No modo catálogo, ações de cadastro/movimentação (`Novo` e `Entrada/Saída`) ficam liberadas apenas para `zamoht.exe@gmail.com`.
+- Personalização de visual do catálogo também fica restrita ao mesmo login.
 
 ## Documentos desta pasta
 

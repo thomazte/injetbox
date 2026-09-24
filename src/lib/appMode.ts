@@ -1,4 +1,4 @@
-export type AppMode = 'demo' | 'operacao' | 'catalogo'
+export type AppMode = 'operacao' | 'catalogo'
 
 export type AppFeatures = {
   canSeeAlerts: boolean
@@ -14,7 +14,6 @@ export type AppFeatures = {
 }
 
 const modeByName: Record<string, AppMode> = {
-  demo: 'demo',
   operacao: 'operacao',
   catalogo: 'catalogo',
 }
@@ -23,19 +22,14 @@ const rawMode = String(import.meta.env.VITE_APP_MODE || 'operacao').trim().toLow
 
 export const appMode: AppMode = modeByName[rawMode] || 'operacao'
 
+function readCatalogEnv(name: string): string {
+  return String(import.meta.env[name] || '').trim()
+}
+
+export const catalogPresetCompanyName = readCatalogEnv('VITE_CATALOG_COMPANY_NAME')
+export const catalogPresetLogoUrl = readCatalogEnv('VITE_CATALOG_LOGO_URL')
+
 export const appFeaturesByMode: Record<AppMode, AppFeatures> = {
-  demo: {
-    canSeeAlerts: true,
-    canSeeHistory: true,
-    canSearchHistory: true,
-    canCreateProducts: true,
-    canImportProducts: true,
-    canEditProducts: true,
-    canDeleteProducts: false,
-    canMoveStock: true,
-    canManageBranding: true,
-    canChangePassword: false,
-  },
   operacao: {
     canSeeAlerts: true,
     canSeeHistory: true,
@@ -65,7 +59,6 @@ export const appFeaturesByMode: Record<AppMode, AppFeatures> = {
 export const appFeatures = appFeaturesByMode[appMode]
 
 export const appModeLabel: Record<AppMode, string> = {
-  demo: 'Demonstracao',
   operacao: 'Operacao',
   catalogo: 'Catalogo',
 }

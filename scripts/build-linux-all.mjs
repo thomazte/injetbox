@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 
-const modes = ['demo', 'operacao', 'catalogo']
+const modes = ['operacao', 'catalogo']
 const bundleDir = path.resolve('release-linux')
 fs.rmSync(bundleDir, { recursive: true, force: true })
 fs.mkdirSync(bundleDir, { recursive: true })

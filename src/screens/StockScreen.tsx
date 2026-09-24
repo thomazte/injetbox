@@ -4,10 +4,12 @@ import { useInventory } from '../context/InventoryContext'
 import { ProductCard } from '../components/ProductCard'
 import { ProductForm } from '../components/ProductForm'
 import { QuickMoveSheet } from '../components/QuickMoveSheet'
+import { useAuth } from '../context/AuthContext'
 import { appFeatures, appMode } from '../lib/appMode'
 import { ImportScreen } from './ImportScreen'
 
 export function StockScreen() {
+  const { canManageCatalogBranding } = useAuth()
   const { products, lowStock, tipos, loading } = useInventory()
   const catalogMode = appMode === 'catalogo'
   const [showInstallHint, setShowInstallHint] = useState(false)
@@ -17,11 +19,12 @@ export function StockScreen() {
   const [creating, setCreating] = useState(false)
   const [importing, setImporting] = useState(false)
   const [quickMoving, setQuickMoving] = useState(false)
-  const showActions =
-    appFeatures.canCreateProducts ||
-    appFeatures.canImportProducts ||
-    appFeatures.canMoveStock ||
-    appFeatures.canEditProducts
+  const canCatalogAdminActions = catalogMode && canManageCatalogBranding
+  const canCreateProducts = appFeatures.canCreateProducts || canCatalogAdminActions
+  const canMoveStock = appFeatures.canMoveStock || canCatalogAdminActions
+  const canEditProducts = appFeatures.canEditProducts
+  const canImportProducts = appFeatures.canImportProducts
+  const showActions = canCreateProducts || canImportProducts || canMoveStock || canEditProducts
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase()
@@ -104,6 +107,9 @@ export function StockScreen() {
           <div className="hidden gap-2 lg:flex lg:shrink-0">
             <StockActions
               compact
+              canCreateProducts={canCreateProducts}
+              canMoveStock={canMoveStock || canEditProducts}
+              canImportProducts={canImportProducts}
               onCreate={() => setCreating(true)}
               onQuickMove={() => setQuickMoving(true)}
               onImport={() => setImporting(true)}
@@ -130,6 +136,9 @@ export function StockScreen() {
       {showActions && (
         <div className="mt-4 flex gap-2 px-4 lg:hidden">
           <StockActions
+            canCreateProducts={canCreateProducts}
+            canMoveStock={canMoveStock || canEditProducts}
+            canImportProducts={canImportProducts}
             onCreate={() => setCreating(true)}
             onQuickMove={() => setQuickMoving(true)}
             onImport={() => setImporting(true)}
@@ -143,7 +152,7 @@ export function StockScreen() {
         <div className="px-5 py-12 text-center">
           <h2 className="text-lg font-semibold">Estoque vazio</h2>
           <p className="mt-2 text-sm text-muted">
-            {appFeatures.canCreateProducts || appFeatures.canImportProducts
+            {canCreateProducts || canImportProducts
               ? 'Importe a planilha do Excel ou cadastre o primeiro produto.'
               : 'Nenhum item disponível para consulta.'}
           </p>
@@ -158,10 +167,10 @@ export function StockScreen() {
         </ul>
       )}
 
-      {appFeatures.canCreateProducts && creating && <ProductForm onClose={() => setCreating(false)} />}
-      {appFeatures.canImportProducts && importing && <ImportScreen onClose={() => setImporting(false)} />}
-      {(appFeatures.canMoveStock || appFeatures.canEditProducts) && quickMoving && (
-        <QuickMoveSheet onClose={() => setQuickMoving(false)} />
+      {canCreateProducts && creating && <ProductForm onClose={() => setCreating(false)} />}
+      {canImportProducts && importing && <ImportScreen onClose={() => setImporting(false)} />}
+      {(canMoveStock || canEditProducts) && quickMoving && (
+        <QuickMoveSheet onClose={() => setQuickMoving(false)} allowCatalogAdminActions={canCatalogAdminActions} />
       )}
     </div>
   )
@@ -169,11 +178,17 @@ export function StockScreen() {
 
 function StockActions({
   compact = false,
+  canCreateProducts,
+  canMoveStock,
+  canImportProducts,
   onCreate,
   onQuickMove,
   onImport,
 }: {
   compact?: boolean
+  canCreateProducts: boolean
+  canMoveStock: boolean
+  canImportProducts: boolean
   onCreate: () => void
   onQuickMove: () => void
   onImport: () => void
@@ -181,7 +196,7 @@ function StockActions({
   const stretch = compact ? 'lg:flex-none lg:px-5' : ''
   return (
     <>
-      {appFeatures.canCreateProducts && (
+      {canCreateProducts && (
         <button
           type="button"
           onClick={onCreate}
@@ -191,7 +206,7 @@ function StockActions({
           Novo
         </button>
       )}
-      {(appFeatures.canMoveStock || appFeatures.canEditProducts) && (
+      {canMoveStock && (
         <button
           type="button"
           onClick={onQuickMove}
@@ -201,7 +216,7 @@ function StockActions({
           Entrada/Saída
         </button>
       )}
-      {appFeatures.canImportProducts && (
+      {canImportProducts && (
         <button
           type="button"
           onClick={onImport}

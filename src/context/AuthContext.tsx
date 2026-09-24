@@ -30,6 +30,7 @@ type AuthContextValue = {
   name: string
   isAdmin: boolean
   isPlatformAdmin: boolean
+  canManageCatalogBranding: boolean
   tenantId: string | null
   companyName: string
   tenantSettings: TenantSettings | null
@@ -47,6 +48,11 @@ type AuthContextValue = {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
+const CATALOG_BRANDING_ADMIN_EMAIL = 'zamoht.exe@gmail.com'
+
+function isCatalogBrandingAdmin(email: string | null | undefined): boolean {
+  return String(email || '').trim().toLowerCase() === CATALOG_BRANDING_ADMIN_EMAIL
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
@@ -167,6 +173,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { id: session.user.id, email: session.user.email }
   }, [session])
   const user = isConfigured ? cloudUser : localUser
+  const canManageCatalogBranding = isPlatformAdmin && isCatalogBrandingAdmin(user?.email)
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -175,6 +182,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       name,
       isAdmin,
       isPlatformAdmin,
+      canManageCatalogBranding,
       tenantId,
       companyName,
       tenantSettings,
@@ -183,8 +191,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       notice,
       async saveTenantSettings(input, targetTenantId) {
         setError(null)
-        if (!isPlatformAdmin) {
-          throw new Error('Somente a conta da plataforma pode alterar o visual do catálogo.')
+        if (!canManageCatalogBranding) {
+          throw new Error('Somente zamoht.exe@gmail.com pode alterar o visual do catálogo.')
         }
         const fallbackTenant = tenantId || user?.id || null
         const effectiveTenant = targetTenantId || fallbackTenant
@@ -419,6 +427,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       name,
       isAdmin,
       isPlatformAdmin,
+      canManageCatalogBranding,
       tenantId,
       companyName,
       tenantSettings,

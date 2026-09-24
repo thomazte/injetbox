@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-const modes = new Set(['demo', 'operacao', 'catalogo'])
+const modes = new Set(['operacao', 'catalogo'])
 const mode = String(process.env.VITE_APP_MODE || 'operacao').trim().toLowerCase()
 
 if (!modes.has(mode)) {

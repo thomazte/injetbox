@@ -19,7 +19,13 @@ function productMeta(product: Pick<Product, 'tipo' | 'category'>) {
   return [product.tipo, product.category].filter(Boolean).join(' · ')
 }
 
-export function QuickMoveSheet({ onClose }: { onClose: () => void }) {
+export function QuickMoveSheet({
+  onClose,
+  allowCatalogAdminActions = false,
+}: {
+  onClose: () => void
+  allowCatalogAdminActions?: boolean
+}) {
   const { products, registerMovement, saveProduct, deleteProduct, brands, tipos, categories, codes } =
     useInventory()
   const [query, setQuery] = useState('')
@@ -39,6 +45,7 @@ export function QuickMoveSheet({ onClose }: { onClose: () => void }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
+  const canMoveStock = appFeatures.canMoveStock || allowCatalogAdminActions
 
   const selected = products.find((item) => item.id === productId) ?? null
   const matches = useMemo(() => {
@@ -268,7 +275,7 @@ export function QuickMoveSheet({ onClose }: { onClose: () => void }) {
               </Field>
             </>
           ) : (
-            appFeatures.canMoveStock && (
+            canMoveStock && (
               <>
                 <div className="grid grid-cols-2 gap-2">
                   <button
@@ -344,7 +351,7 @@ export function QuickMoveSheet({ onClose }: { onClose: () => void }) {
           </>
         ) : (
           <>
-            {appFeatures.canMoveStock && (
+            {canMoveStock && (
               <button
                 type="submit"
                 disabled={busy}

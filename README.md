@@ -1,6 +1,6 @@
 # InjetBox
 
-Sistema de controle de estoque com 3 modos (`demo`, `operacao`, `catalogo`) e tema por empresa.
+Sistema de controle de estoque com 2 modos (`operacao`, `catalogo`) e tema por empresa.
 
 ## Início rápido
 
@@ -17,14 +17,19 @@ Abra: `http://localhost:5173/`
 - Web (dev): `npm run dev`
 - Build: `npm run build`
 - Desktop (Windows): `npm run desktop` / `npm run desktop:build`
-- Desktop (Linux): `npm run desktop:build:linux` (modo atual) / `npm run desktop:build:linux:all` (demo, operação e catálogo)
+- Desktop (Linux): `npm run desktop:build:linux` (modo atual) / `npm run desktop:build:linux:all` (operação e catálogo)
 - Android (APK): `npm run android:apk`
+- Catalogo por cliente (web): `npm run catalogo:cliente -- --name "Cliente" --logo "https://..."` (`--deploy` para publicar no Worker)
 
 ## Modos de execução
 
-- Demo: `$env:VITE_APP_MODE="demo"; npm run dev`
 - Operação: `$env:VITE_APP_MODE="operacao"; npm run dev`
 - Catálogo: `$env:VITE_APP_MODE="catalogo"; npm run dev`
+
+## Regras de acesso
+
+- No catálogo, as ações `Novo` e `Entrada/Saída` ficam disponíveis somente para o login `zamoht.exe@gmail.com`.
+- A personalização de visual do catálogo (aba `Visual`) também fica restrita ao login `zamoht.exe@gmail.com`.
 
 ## Documentação
 
