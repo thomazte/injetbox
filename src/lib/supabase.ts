@@ -1,8 +1,15 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from './supabasePublic'
 
-const url = import.meta.env.VITE_SUPABASE_URL || SUPABASE_URL
-const key = import.meta.env.VITE_SUPABASE_ANON_KEY || SUPABASE_ANON_KEY
+function fromEnv(value: string | undefined) {
+  const clean = String(value || '').trim()
+  // Evita placeholders comuns de setup quebrando o deploy web.
+  if (!clean || clean.includes('...') || clean.includes('YOUR_')) return ''
+  return clean
+}
+
+const url = fromEnv(import.meta.env.VITE_SUPABASE_URL) || SUPABASE_URL
+const key = fromEnv(import.meta.env.VITE_SUPABASE_ANON_KEY) || SUPABASE_ANON_KEY
 
 export const isConfigured = Boolean(url && key)
 
