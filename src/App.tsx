@@ -215,7 +215,7 @@ function Shell() {
           <div className="min-w-0">
             <p className="text-sm text-muted lg:hidden">{greeting()}</p>
             <div className="mt-0.5 flex items-center gap-2.5">
-              {tab === 'estoque' && <StockTitleLogo src={stockTitleLogoUrl} alt={APP_NAME} />}
+              {tab === 'estoque' && appMode !== 'catalogo' && <StockTitleLogo src={stockTitleLogoUrl} alt={APP_NAME} />}
               <h1 className="truncate text-[28px] leading-tight font-semibold tracking-tight lg:text-[32px]">
                 {titles[tab] ?? 'InjetBox'}
               </h1>
