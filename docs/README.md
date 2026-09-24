@@ -90,6 +90,27 @@ Scripts úteis:
 - `npm run android:apk`
 - `npm run catalogo:cliente -- --name "Cliente" --logo "https://..."` (gera catálogo web por cliente)
 
+Comandos essenciais:
+
+- Desenvolvimento web: `npm run dev`
+- Build web: `npm run build`
+- Desktop Windows: `npm run desktop:build`
+- Desktop Linux: `npm run desktop:build:linux`
+- Desktop Linux (operação + catálogo): `npm run desktop:build:linux:all`
+- APK Android: `npm run android:apk`
+
+Catálogo por cliente:
+
+```bash
+npm run catalogo:cliente -- --name "Nome do Cliente" --logo "https://exemplo.com/logo.png"
+```
+
+Para publicar direto no Worker:
+
+```bash
+npm run catalogo:cliente -- --name "Nome do Cliente" --logo "https://exemplo.com/logo.png" --deploy
+```
+
 ## Build, release e distribuição
 
 - CI padrão: `lint + build` a cada push/PR na `main`.
