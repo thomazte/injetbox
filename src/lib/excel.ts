@@ -12,6 +12,7 @@ function fold(value: string): string {
 
 const BRAND_HINTS = ['marca', 'brand', 'fabricante', 'nome']
 const CODE_HINTS = ['codigo', 'sku', 'ref', 'referencia']
+const APPLICATION_HINTS = ['aplicacao', 'aplic', 'veiculo', 'modelo', 'motor']
 const TIPO_HINTS = ['tipo', 'classe', 'grupo', 'familia']
 const CATEGORY_HINTS = ['categoria', 'category']
 const QTY_HINTS = ['quantidade', 'qtd', 'qtde', 'estoque', 'saldo']
@@ -38,6 +39,7 @@ function suggestMapping(headers: string[]): ColumnMapping {
   return {
     brand,
     code: pickHeader(headers, CODE_HINTS, used),
+    application: pickHeader(headers, APPLICATION_HINTS, used),
     tipo: pickHeader(headers, TIPO_HINTS, used),
     category: pickHeader(headers, CATEGORY_HINTS, used),
     quantity: pickHeader(headers, QTY_HINTS, used),
@@ -87,6 +89,7 @@ export function rowsToDrafts(
       return {
         brand,
         code,
+        application: mapping.application ? cellText(row[mapping.application]) : '',
         tipo: mapping.tipo ? cellText(row[mapping.tipo]) : 'Geral',
         category: mapping.category ? cellText(row[mapping.category]) : '',
         quantity: mapping.quantity ? cellNumber(row[mapping.quantity]) : 0,

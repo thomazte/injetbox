@@ -23,6 +23,7 @@ export function normalizeProduct(row: LooseRecord): Product {
     id: text(row.id) || crypto.randomUUID(),
     code: text(row.code) || null,
     brand: text(row.brand) || text(row.name),
+    application: text(row.application) || null,
     tipo: tipo || (legacyTipo ? storedCategory : '') || 'Geral',
     category: legacyTipo ? DEFAULT_CATEGORY : 'category' in row ? storedCategory : DEFAULT_CATEGORY,
     quantity: number(row.quantity),

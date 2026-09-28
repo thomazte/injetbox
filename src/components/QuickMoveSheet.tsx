@@ -3,6 +3,7 @@ import { useInventory } from '../context/InventoryContext'
 import { appFeatures } from '../lib/appMode'
 import { formatQty } from '../lib/format'
 import { productTitle } from '../lib/product'
+import { useDesktopEscClose } from '../lib/useDesktopEscClose'
 import type { MovementType, Product } from '../types'
 import { Field } from './Field'
 import { SuggestField } from './SuggestField'
@@ -26,6 +27,7 @@ export function QuickMoveSheet({
   onClose: () => void
   allowCatalogAdminActions?: boolean
 }) {
+  useDesktopEscClose(onClose)
   const { products, registerMovement, saveProduct, deleteProduct, brands, tipos, categories, codes } =
     useInventory()
   const [query, setQuery] = useState('')
@@ -37,6 +39,7 @@ export function QuickMoveSheet({
   const [editing, setEditing] = useState(false)
   const [brand, setBrand] = useState('')
   const [code, setCode] = useState('')
+  const [application, setApplication] = useState('')
   const [tipo, setTipo] = useState('')
   const [category, setCategory] = useState('')
   const [minQuantity, setMinQuantity] = useState('0')
@@ -61,6 +64,7 @@ export function QuickMoveSheet({
   function fillEdit(product: Product) {
     setBrand(product.brand)
     setCode(product.code ?? '')
+    setApplication(product.application ?? '')
     setTipo(product.tipo)
     setCategory(product.category)
     setMinQuantity(String(product.min_quantity))
@@ -123,6 +127,7 @@ export function QuickMoveSheet({
         {
           brand,
           code,
+          application,
           tipo,
           category,
           quantity: selected.quantity,
@@ -161,12 +166,9 @@ export function QuickMoveSheet({
   }
 
   return (
-    <div
-      className="overlay fixed inset-0 z-40 flex items-center justify-center px-3 py-6"
-      onClick={onClose}
-    >
+    <div className="overlay fixed inset-0 z-40 flex items-center justify-center px-3 py-6">
       <form
-        className="sheet-enter sheet-panel mx-auto max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-3xl p-5 lg:max-w-md"
+        className="no-scrollbar sheet-enter sheet-panel mx-auto max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-3xl p-5 lg:max-w-md"
         onClick={(event) => event.stopPropagation()}
         onSubmit={editing ? onSave : onMove}
       >
@@ -252,6 +254,13 @@ export function QuickMoveSheet({
             <>
               <SuggestField label="Código" value={code} onChange={setCode} options={codes} />
               <SuggestField label="Marca" value={brand} onChange={setBrand} options={brands} required />
+              <Field label="Aplicação">
+                <input
+                  value={application}
+                  onChange={(event) => setApplication(event.target.value)}
+                  placeholder="Ex.: Gol 1.6, Onix 1.0, etc."
+                />
+              </Field>
               <SuggestField label="Tipo" value={tipo} onChange={setTipo} options={tipos} />
               <SuggestField label="Categoria" value={category} onChange={setCategory} options={categories} />
               <div className="grid grid-cols-2 gap-3">

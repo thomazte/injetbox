@@ -5,6 +5,7 @@ export type Product = {
   tenant_id?: string | null
   code: string | null
   brand: string
+  application: string | null
   tipo: string
   category: string
   quantity: number
@@ -64,6 +65,7 @@ export type StockStatus = 'ok' | 'baixo' | 'zerado'
 export type ColumnMapping = {
   brand: string
   code: string | ''
+  application: string | ''
   tipo: string | ''
   category: string | ''
   quantity: string | ''
@@ -81,6 +83,7 @@ export type ParsedSheet = {
 export type ProductDraft = {
   brand: string
   code: string
+  application: string
   tipo: string
   category: string
   quantity: number

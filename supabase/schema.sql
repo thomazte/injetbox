@@ -52,6 +52,7 @@ create table if not exists public.products (
   user_id uuid not null references auth.users (id) on delete cascade,
   code text,
   brand text not null,
+  application text,
   tipo text not null default 'Geral',
   category text not null default '',
   quantity numeric not null default 0,

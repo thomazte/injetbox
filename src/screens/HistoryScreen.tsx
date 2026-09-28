@@ -4,6 +4,7 @@ import { useInventory } from '../context/InventoryContext'
 import { Field } from '../components/Field'
 import { appFeatures } from '../lib/appMode'
 import { formatQty, formatWhen } from '../lib/format'
+import { useDesktopEscClose } from '../lib/useDesktopEscClose'
 import type { Movement } from '../types'
 
 const typeLabel = {
@@ -152,11 +153,10 @@ function SearchSheet({
   onClose: () => void
   onApply: () => void
 }) {
+  useDesktopEscClose(onClose)
+
   return (
-    <div
-      className="overlay fixed inset-0 z-40 flex items-center justify-center px-3 py-6"
-      onClick={onClose}
-    >
+    <div className="overlay fixed inset-0 z-40 flex items-center justify-center px-3 py-6">
       <form
         className="sheet-enter sheet-panel mx-auto w-full max-w-lg rounded-3xl p-5 lg:max-w-md"
         onClick={(event) => event.stopPropagation()}

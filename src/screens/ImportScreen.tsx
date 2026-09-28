@@ -1,11 +1,13 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import { parseWorkbook, rowsToDrafts } from '../lib/excel'
 import { useInventory } from '../context/InventoryContext'
+import { useDesktopEscClose } from '../lib/useDesktopEscClose'
 import type { ColumnMapping, ParsedSheet } from '../types'
 
 const fields: { key: keyof ColumnMapping; label: string; required?: boolean }[] = [
   { key: 'code', label: 'Código' },
   { key: 'brand', label: 'Marca', required: true },
+  { key: 'application', label: 'Aplicação' },
   { key: 'tipo', label: 'Tipo' },
   { key: 'category', label: 'Categoria' },
   { key: 'quantity', label: 'Quantidade' },
@@ -15,6 +17,7 @@ const fields: { key: keyof ColumnMapping; label: string; required?: boolean }[] 
 ]
 
 export function ImportScreen({ onClose }: { onClose: () => void }) {
+  useDesktopEscClose(onClose)
   const { importProducts } = useInventory()
   const [sheet, setSheet] = useState<ParsedSheet | null>(null)
   const [mapping, setMapping] = useState<ColumnMapping | null>(null)
@@ -111,7 +114,8 @@ export function ImportScreen({ onClose }: { onClose: () => void }) {
                   <ul className="mt-2 space-y-1 text-sm">
                     {preview.map((row) => (
                       <li key={`${row.brand}-${row.code}-${row.tipo}`}>
-                        {row.code || row.brand} · {row.brand} · {row.quantity} {row.unit}
+                        {row.code || row.brand} · {[row.brand, row.application].filter(Boolean).join(' · ')} ·{' '}
+                        {row.quantity} {row.unit}
                       </li>
                     ))}
                   </ul>

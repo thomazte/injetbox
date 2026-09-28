@@ -2,11 +2,14 @@ import { useState, type FormEvent } from 'react'
 import { Field } from './Field'
 import { SuggestField } from './SuggestField'
 import { useInventory } from '../context/InventoryContext'
+import { useDesktopEscClose } from '../lib/useDesktopEscClose'
 
 export function ProductForm({ onClose }: { onClose: () => void }) {
+  useDesktopEscClose(onClose)
   const { saveProduct, brands, tipos, categories, codes } = useInventory()
   const [brand, setBrand] = useState('')
   const [code, setCode] = useState('')
+  const [application, setApplication] = useState('')
   const [tipo, setTipo] = useState('')
   const [category, setCategory] = useState('')
   const [quantity, setQuantity] = useState('0')
@@ -24,6 +27,7 @@ export function ProductForm({ onClose }: { onClose: () => void }) {
       await saveProduct({
         brand,
         code,
+        application,
         tipo,
         category,
         quantity: Number(quantity.replace(',', '.')) || 0,
@@ -40,10 +44,7 @@ export function ProductForm({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div
-      className="overlay fixed inset-0 z-40 flex items-center justify-center px-3 py-6"
-      onClick={onClose}
-    >
+    <div className="overlay fixed inset-0 z-40 flex items-center justify-center px-3 py-6">
       <form
         className="sheet-enter sheet-panel mx-auto max-h-[90dvh] max-w-lg overflow-y-auto rounded-3xl p-5 lg:w-full lg:max-w-xl"
         onClick={(event) => event.stopPropagation()}
@@ -71,6 +72,13 @@ export function ProductForm({ onClose }: { onClose: () => void }) {
             placeholder="Digite ou escolha"
             required
           />
+          <Field label="Aplicação">
+            <input
+              value={application}
+              onChange={(event) => setApplication(event.target.value)}
+              placeholder="Ex.: Gol 1.6, Onix 1.0, etc."
+            />
+          </Field>
           <SuggestField
             label="Tipo"
             value={tipo}

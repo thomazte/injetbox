@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useDesktopEscClose } from '../lib/useDesktopEscClose'
 import { Field } from './Field'
 
 export function PasswordSheet({ onClose }: { onClose: () => void }) {
+  useDesktopEscClose(onClose)
   const { changePassword } = useAuth()
   const [current, setCurrent] = useState('')
   const [next, setNext] = useState('')
@@ -33,10 +35,7 @@ export function PasswordSheet({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div
-      className="overlay fixed inset-0 z-40 flex items-center justify-center px-3 py-6"
-      onClick={onClose}
-    >
+    <div className="overlay fixed inset-0 z-40 flex items-center justify-center px-3 py-6">
       <form
         className="sheet-enter sheet-panel mx-auto w-full max-w-lg rounded-3xl p-5 lg:max-w-md"
         onClick={(event) => event.stopPropagation()}
