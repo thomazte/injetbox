@@ -31,6 +31,7 @@ export function ProductCard({
             color: 'var(--status-ok-text)',
           }
   const meta = [product.category, product.tipo].filter(Boolean).join(' · ')
+  const brandMeta = [product.brand, product.application].filter(Boolean).join(' · ')
   const quantityLabel = formatQty(product.quantity, product.unit)
   const body = (
     <>
@@ -45,11 +46,11 @@ export function ProductCard({
         </span>
         {!catalogView ? (
           <span className="mt-1 block text-xs text-muted">
-            {product.brand ? `${product.brand} · ` : ''}
+            {brandMeta ? `${brandMeta} · ` : ''}
             mín. {formatQty(product.min_quantity, product.unit)}
           </span>
         ) : (
-          product.brand && <span className="mt-1 block text-xs text-muted">{product.brand}</span>
+          brandMeta && <span className="mt-1 block text-xs text-muted">{brandMeta}</span>
         )}
       </span>
       <span className="flex w-[4.85rem] shrink-0 flex-col items-center justify-center" style={statusStyle}>

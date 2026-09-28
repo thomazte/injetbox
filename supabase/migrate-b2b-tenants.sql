@@ -49,6 +49,8 @@ alter table public.tenant_settings add column if not exists stock_zero_text_colo
 
 alter table public.products
   add column if not exists tenant_id uuid references public.tenants (id) on delete cascade;
+alter table public.products
+  add column if not exists application text;
 
 alter table public.movements
   add column if not exists tenant_id uuid references public.tenants (id) on delete cascade;
